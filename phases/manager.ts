@@ -8,7 +8,7 @@ import {
   pushPhase,
 } from "./meta";
 
-import type { PhasePacket } from "./01_title/title.types";
+export type { PhasePacket } from "./01_title/title.types";
 
 export type PhaseManagerEvent =
   | {

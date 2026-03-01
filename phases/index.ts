@@ -1,24 +1,18 @@
 // phases/index.ts
-
-// Core Engine API
+export { boot, recoverRun, commitActivePacket, readActivePacket } from "./boot";
 export { initManager, getPhase, transition, onManagerEvent } from "./manager";
-export type { PhaseManagerEvent } from "./manager";
+export {
+  initRunMeta,
+  getRunMeta,
+  snapshot,
+  restoreSnapshot,
+  hydrateFromSnapshot,
+  clearSnapshot,
+  addToInventory,
+  shiftAlignment,
+  lockIdentity,
+} from "./meta";
+export { wireRouter, routerReact, routerCLI, routerVanilla } from "./router";
 
-// State & Meta API
-export { initRunMeta, getRunMeta, restoreSnapshot, hydrateFromSnapshot, clearSnapshot } from "./meta";
-export type { PhaseId, RunMetaSnapshot, Alignment, Parity } from "./meta";
-
-// Router Adapters
-export { routerReact, routerCLI, routerVanilla, wireRouter } from "./router";
-
-// Bootloader
-export { boot, recoverRun } from "./boot";
-
-// Canonical Types (Exported from the rich title.types)
-export type { 
-  PhasePacket, 
-  UserIdentity, 
-  PlayerIdentity, 
-  SelectionPool, 
-  ExchangePath 
-} from "./01_title/title.types";
+export type { PhaseId, Alignment, Parity, RunMetaSnapshot } from "./meta";
+export type { PhasePacket, PhaseManagerEvent } from "./manager";

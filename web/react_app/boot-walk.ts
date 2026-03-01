@@ -1,16 +1,15 @@
-// workbench/web/react_app/boot-walk.ts
-import { boot } from "@/workbench/phases/boot";
-import { installPhaseWalkHotkeys } from "@/workbench/phases/dev-walk";
+import { boot } from "@du/phases";
+import { installPhaseWalkHotkeys } from "./dev-walk";
 
 boot();
 installPhaseWalkHotkeys();
 
-if (!window.sessionStorage.getItem("dudael:dev_started")) {
-  window.sessionStorage.setItem("dudael:dev_started", "1");
+if (!sessionStorage.getItem("dudael:dev_started")) {
+  sessionStorage.setItem("dudael:dev_started", "1");
 
   window.dispatchEvent(
     new CustomEvent("dudael:exchange", {
-      detail: { from: "01_title", to: "02_select", ts: Date.now(), user: { id: "guest" } },
+      detail: { from: "01_title", to: "02_select", ts: Date.now(), user: { id: "guest" } }
     })
   );
 }

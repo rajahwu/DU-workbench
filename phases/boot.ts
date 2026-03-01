@@ -1,6 +1,7 @@
 // phases/boot.ts
 import { initRunMeta, restoreSnapshot, hydrateFromSnapshot, clearSnapshot } from "./meta";
-import { initManager, transition, type PhasePacket } from "./manager";
+import { initManager, transition } from "./manager";
+import type { PhasePacket } from "./01_title/title.types";
 
 const ACTIVE_PACKET_KEY = "dudael:active_packet";
 

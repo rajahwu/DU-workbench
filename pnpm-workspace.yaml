@@ -1,8 +1,8 @@
 packages:
+  - "phases"
   - "web/react_app"
   # - "cli/terminal_app"
   # - "api"
-  # - "phases"
   # - "game/*"
   # - "db"
   # - "config"
