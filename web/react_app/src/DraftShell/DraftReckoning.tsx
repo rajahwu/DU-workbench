@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import { transition, getRunMeta } from '@du/phases';
+import { formatEffect } from '@data/cards/pool';
+import type { DraftCard } from '@data/cards/types';
 
 // DraftReckoning — Stage 4C
 // The player sees what their picks did to parity.
@@ -14,15 +16,15 @@ export default function DraftReckoning() {
     const runMeta   = getRunMeta();
 
     // Cards arrive from Offering via router state
-    const selectedCards: any[] = location.state?.selectedCards ?? [];
+    const selectedCards: DraftCard[] = (location.state?.selectedCards ?? []) as DraftCard[];
 
     const light  = runMeta?.alignment?.light ?? 0;
     const dark   = runMeta?.alignment?.dark  ?? 0;
     const vessel = runMeta?.identity?.vessel?.toUpperCase() ?? '';
 
     // Compute parity deltas from selected cards
-    const lightDelta = selectedCards.reduce((sum: number, c: any) => sum + (c.light ?? 0), 0);
-    const darkDelta  = selectedCards.reduce((sum: number, c: any) => sum + (c.dark  ?? 0), 0);
+    const lightDelta = selectedCards.reduce((sum, c) => sum + (c.mechanics?.lightDelta ?? 0), 0);
+    const darkDelta  = selectedCards.reduce((sum, c) => sum + (c.mechanics?.darkDelta  ?? 0), 0);
 
     const newLight = light + lightDelta;
     const newDark  = dark  + darkDelta;
@@ -32,8 +34,8 @@ export default function DraftReckoning() {
     // Responds to: card combination, vessel, and parity swing
 
     const keeperComment = (() => {
-        const lightCards = selectedCards.filter((c: any) => c.keeper === 'surveyor');
-        const darkCards  = selectedCards.filter((c: any) => c.keeper === 'smuggler');
+        const lightCards = selectedCards.filter(c => c.keeper === 'surveyor');
+        const darkCards  = selectedCards.filter(c => c.keeper === 'smuggler');
         const bothLight  = lightCards.length === 2;
         const bothDark   = darkCards.length  === 2;
         const mixed      = lightCards.length === 1 && darkCards.length === 1;
@@ -104,7 +106,7 @@ export default function DraftReckoning() {
                 <div style={{ fontSize: 8, letterSpacing: 2, color: '#2A2D38', marginBottom: 4, textTransform: 'uppercase' }}>
                     You accepted
                 </div>
-                {selectedCards.map((card: any) => (
+                {selectedCards.map((card) => (
                     <div key={card.id} style={{
                         display: 'flex',
                         justifyContent: 'space-between',
@@ -116,7 +118,7 @@ export default function DraftReckoning() {
                     }}>
                         <span>{card.name}</span>
                         <span style={{ color: card.keeper === 'surveyor' ? '#D4A843' : '#7B4FA2', fontSize: 8 }}>
-                            {card.effect}
+                            {formatEffect(card.mechanics)}
                         </span>
                     </div>
                 ))}

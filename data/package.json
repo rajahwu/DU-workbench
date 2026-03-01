@@ -1,0 +1,11 @@
+{
+    "name": "@du/data",
+    "version": "0.0.0",
+    "private": true,
+    "type": "module",
+    "main": "index.ts",
+    "types": "index.ts",
+    "dependencies": {
+        "lodash": "^4.17.21"
+    }
+}

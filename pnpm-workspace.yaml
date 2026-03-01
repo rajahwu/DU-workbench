@@ -1,6 +1,8 @@
 packages:
   - "phases"
   - "web/react_app"
+  - "data/cards"
+  - "data/vessels"
   # - "cli/terminal_app"
   # - "api"
   # - "game/*"

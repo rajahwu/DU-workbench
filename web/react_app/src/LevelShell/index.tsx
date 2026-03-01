@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { transition, getRunMeta } from '@du/phases';
+import { VESSELS, getLevelCombatDeltas, type VesselId } from '@data/vessels/vessels';
 import './style.css';
 
 const levelNames = ['The Threshold', 'The Hollow', 'The Furnace', 'The Archive', 'Dudael Core'];
@@ -8,8 +9,13 @@ const levelTypes = ['Puzzle', 'Top-Down', 'Platformer', 'Puzzle', 'Survival'];
 export default function LevelShell() {
     const runMeta = getRunMeta();
     const depth = runMeta.depth || 1;
+    const vessel = runMeta?.identity?.vessel?.toUpperCase() ?? '';
     const maxDepth = 5;
-    const maxHealth = 10;
+
+    // Vessel-aware combat config
+    const vesselId = (vessel || 'EXILE') as VesselId;
+    const combatDeltas = getLevelCombatDeltas(vesselId);
+    const maxHealth = VESSELS[vesselId].maxHealth;
 
     // Game State
     const [gameActive, setGameActive] = useState(false);
@@ -27,7 +33,7 @@ export default function LevelShell() {
     const [cellEffects, setCellEffects] = useState<Record<number, 'hit' | 'miss'>>({});
 
     // Ref for safe tracking inside intervals
-    const stateRef = useRef({ health, points, tapsHit: 0, tapsNeeded: 5 + (depth * 2) });
+    const stateRef = useRef({ health, points, tapsHit: 0, missCount: 0, tapsNeeded: 5 + (depth * 2) });
 
     // Initialize and start game
     useEffect(() => {
@@ -57,7 +63,7 @@ export default function LevelShell() {
                     endGame("TIME EXPIRED", false);
                     return 0;
                 }
-                return prev - 1.5;
+                return prev - (1.5 * combatDeltas.timerMultiplier);
             });
         }, 100);
 
@@ -107,13 +113,20 @@ export default function LevelShell() {
             setLitCell(null);
 
             stateRef.current.tapsHit += 1;
-            stateRef.current.points += depth;
+            stateRef.current.points += depth * combatDeltas.pointsPerHit;
             setPoints(stateRef.current.points);
 
             if (litCell.type === 'light') setLight(l => l + 1);
             else setDark(d => d + 1);
 
             if (stateRef.current.tapsHit >= stateRef.current.tapsNeeded) {
+                // Perfect level: zero misses → heal
+                if (stateRef.current.missCount === 0 && combatDeltas.perfectLevelHeal > 0) {
+                    stateRef.current.health = Math.min(
+                        stateRef.current.health + combatDeltas.perfectLevelHeal, maxHealth
+                    );
+                    setHealth(stateRef.current.health);
+                }
                 endGame("DEPTH CLEARED", true);
             } else {
                 setTimeout(lightRandomCell, 300);
@@ -121,13 +134,20 @@ export default function LevelShell() {
         } else {
             // MISS
             setCellEffects({ [idx]: 'miss' });
-            stateRef.current.health -= 1;
-            setHealth(stateRef.current.health);
+            stateRef.current.missCount += 1;
+
+            // Miss forgiveness: every Nth miss is absorbed (e.g. Shadow every 3rd)
+            const forgiven = combatDeltas.missForgivenessEveryN !== null
+                && stateRef.current.missCount % combatDeltas.missForgivenessEveryN === 0;
+
+            if (!forgiven) {
+                stateRef.current.health -= combatDeltas.damagePerMiss;
+                setHealth(stateRef.current.health);
+            }
 
             if (stateRef.current.health <= 0) {
                 endGame("VESSEL DESTROYED", false);
             } else {
-                // Clear effect after a moment
                 setTimeout(() => setCellEffects(prev => {
                     const next = { ...prev };
                     delete next[idx];

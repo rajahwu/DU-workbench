@@ -1,5 +1,6 @@
 import React from 'react';
 import { transition, getRunMeta } from '@du/phases';
+import { getDoorCosts, getSecretDoorThreshold, type VesselId } from '@data/vessels/vessels';
 import './style.css';
 
 export default function DoorShell() {
@@ -10,14 +11,15 @@ export default function DoorShell() {
     const depth = runMeta.depth;
     const maxDepth = 5;
 
-    // Door Requirements scale with depth
-    const lightReq = depth + 1;
-    const darkReq = depth + 1;
-    const secretReq = depth * 2;
+    // Door costs from vessel config — scale with depth + vessel modifiers
+    const packetRaw = localStorage.getItem("dudael:active_packet");
+    const vesselId = (packetRaw ? JSON.parse(packetRaw)?.player?.vessel : 'EXILE') as VesselId;
+    const { lightCost, darkCost } = getDoorCosts(vesselId, depth);
+    const secretThreshold = getSecretDoorThreshold(vesselId);
 
-    const canLight = light >= lightReq;
-    const canDark = dark >= darkReq;
-    const canSecret = (light + dark) >= secretReq;
+    const canLight = light >= lightCost;
+    const canDark = dark >= darkCost;
+    const canSecret = (dark - light) >= secretThreshold;
     const isMaxDepth = depth >= maxDepth;
 
     const handleChooseDoor = (path: 'light' | 'dark' | 'secret') => {
@@ -83,7 +85,7 @@ export default function DoorShell() {
                     <div className="door-option-name" style={{ color: '#D4A843' }}>Path of Light</div>
                     <div className="door-option-desc">A corridor of sanctified luminescence</div>
                     <div className="door-cost">
-                        Requires: <span className="required" style={{ color: '#D4A843' }}>{lightReq} Light</span> {canLight ? '✓' : '— locked'}
+                        Requires: <span className="required" style={{ color: '#D4A843' }}>{lightCost} Light</span> {canLight ? '✓' : '— locked'}
                     </div>
                 </div>
 
@@ -95,7 +97,7 @@ export default function DoorShell() {
                     <div className="door-option-name" style={{ color: '#7B4FA2' }}>Path of Shadow</div>
                     <div className="door-option-desc">A passage shrouded in twilight</div>
                     <div className="door-cost">
-                        Requires: <span className="required" style={{ color: '#7B4FA2' }}>{darkReq} Dark</span> {canDark ? '✓' : '— locked'}
+                        Requires: <span className="required" style={{ color: '#7B4FA2' }}>{darkCost} Dark</span> {canDark ? '✓' : '— locked'}
                     </div>
                 </div>
 
@@ -107,7 +109,7 @@ export default function DoorShell() {
                     <div className="door-option-name" style={{ color: '#B8863B' }}>Secret Door</div>
                     <div className="door-option-desc">Requires mastery of both paths</div>
                     <div className="door-cost">
-                        Requires: <span className="required" style={{ color: '#B8863B' }}>{secretReq} Combined</span> {canSecret ? '✓' : '— locked'}
+                        Requires: <span className="required" style={{ color: '#B8863B' }}>{secretThreshold}+ Dark over Light</span> {canSecret ? '✓' : '— locked'}
                     </div>
                 </div>
 

@@ -21,7 +21,7 @@ export type { PhaseId, Alignment, PlayerIdentity, PhasePacket } from "./types";
 export type { PhaseManagerEvent } from "./manager";
 
 // ✅ title entry + (optional) exchange helpers
-export { mountTitleScreen } from "./01_title/title-screen";
+// export { mountTitleScreen } from "../../RDX/archive/title-screen.ts.old";
 export { titleExchange, loadUserProfile, commitExchange } from "./01_title/title-exchange";
 export { DEFAULT_POOL } from "./02_select/pool";
 

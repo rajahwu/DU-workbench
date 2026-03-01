@@ -1,32 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { getRunMeta } from '@du/phases';
-
-// DraftOffering — Stage 4B
-// The cards are revealed. The player picks 2.
-// This is where the existing DraftShell logic lives now.
-// On commit, selected cards are passed to Reckoning via router state.
-
-// ── Card Pool ────────────────────────────────────────────────────────────────
-// TODO: replace with live card pool from game/core/cards/types.ts
-// and vessel-aware getDraftPoolCounts() from game/core/vessels/vessels.ts
-
-const cardPool = {
-    light: [
-        { id: 'l1', keeper: 'surveyor', name: 'Sanctum Ward',           effect: '+2 Light',          light: 2, dark: 0 },
-        { id: 'l2', keeper: 'surveyor', name: 'Grace Thread',            effect: '+1 Light',          light: 1, dark: 0 },
-        { id: 'l3', keeper: 'surveyor', name: 'Beacon Pulse',            effect: '+3 Light',          light: 3, dark: 0 },
-        { id: 'l4', keeper: 'surveyor', name: 'Covenant Seal',           effect: '+1 Light, +1 HP',   light: 1, dark: 0, heal: 1 },
-        { id: 'l5', keeper: 'surveyor', name: 'Lantern at the Threshold',effect: '+2 Light, +1 HP',   light: 2, dark: 0, heal: 1 },
-    ],
-    dark: [
-        { id: 'd1', keeper: 'smuggler', name: "Root-Cutter's Venom",    effect: '+2 Dark',           light: 0, dark: 2 },
-        { id: 'd2', keeper: 'smuggler', name: 'Veil Fragment',           effect: '+1 Dark',           light: 0, dark: 1 },
-        { id: 'd3', keeper: 'smuggler', name: 'Abyssal Echo',            effect: '+3 Dark',           light: 0, dark: 3 },
-        { id: 'd4', keeper: 'smuggler', name: "Smuggler's Cut",          effect: '+1 Dark, +2 PTS',   light: 0, dark: 1, points: 2 },
-        { id: 'd5', keeper: 'smuggler', name: 'Root-Whisper',            effect: '+3 Dark, -Stability',light: 0, dark: 3, stabilityDelta: -1 },
-    ]
-};
+import { LIGHT_POOL, DARK_POOL, formatEffect } from '@data/cards/pool';
+import type { DraftCard } from '@data/cards/types';
+import { getDraftPoolCounts, type VesselId } from '@data/vessels/vessels';
 
 const shuffle = (arr: any[]) => [...arr].sort(() => 0.5 - Math.random());
 
@@ -37,21 +14,23 @@ export default function DraftOffering() {
     const runMeta   = getRunMeta();
     const maxPicks  = 2;
 
-    const vessel  = runMeta?.player?.vessel?.toUpperCase() ?? '';
-    const insight = runMeta?.meta?.insight ?? 0;
+    const vessel  = runMeta?.identity?.vessel?.toUpperCase() ?? '';
+    const insight = runMeta?.insight ?? 0;
 
-    const [offerings, setOfferings] = useState<{ light: any[]; dark: any[] }>({ light: [], dark: [] });
-    const [picked, setPicked]       = useState<any[]>([]);
+    const [offerings, setOfferings] = useState<{ light: DraftCard[]; dark: DraftCard[] }>({ light: [], dark: [] });
+    const [picked, setPicked]       = useState<DraftCard[]>([]);
     const [rerolls, setRerolls]     = useState(1);
 
     useEffect(() => { dealCards(); }, []);
 
-    // TODO: wire getDraftPoolCounts(vessel, light, dark) here
-    // to determine how many light/dark cards to slice
     const dealCards = () => {
+        const vesselId = (vessel || 'EXILE') as VesselId;
+        const { lightCards, darkCards } = getDraftPoolCounts(
+            vesselId, runMeta?.alignment?.light ?? 0, runMeta?.alignment?.dark ?? 0
+        );
         setOfferings({
-            light: shuffle(cardPool.light).slice(0, 2),
-            dark:  shuffle(cardPool.dark).slice(0, 2),
+            light: shuffle(LIGHT_POOL).slice(0, lightCards),
+            dark:  shuffle(DARK_POOL).slice(0, darkCards),
         });
         setPicked([]);
     };
@@ -63,7 +42,7 @@ export default function DraftOffering() {
         }
     };
 
-    const handlePick = (card: any) => {
+    const handlePick = (card: DraftCard) => {
         if (picked.length < maxPicks && !picked.find(c => c.id === card.id)) {
             setPicked(prev => [...prev, card]);
         }
@@ -79,8 +58,7 @@ export default function DraftOffering() {
     };
 
     // Insight-gated visibility — Penitent sees more per card
-    // TODO: wire full visibility manifest from card.types.ts
-    const showEffect = (card: any) => {
+    const showEffect = (card: DraftCard) => {
         if (vessel === 'PENITENT' && insight === 0) return false; // pure lore at 0
         return true;
     };
@@ -100,7 +78,7 @@ export default function DraftOffering() {
                         <span className="keeper-name" style={{ color: '#D4A843' }}>The Surveyor</span>
                         <span className="keeper-tag" style={{ borderColor: '#D4A84340', color: '#D4A843' }}>Light</span>
                     </div>
-                    {offerings.light.map((card: any) => (
+                    {offerings.light.map((card) => (
                         <div
                             key={card.id}
                             className={`draft-card ${picked.find(c => c.id === card.id) ? 'picked' : ''}`}
@@ -109,7 +87,7 @@ export default function DraftOffering() {
                             <span className="draft-card-name">{card.name}</span>
                             {showEffect(card) && (
                                 <span className="draft-card-effect" style={{ color: cardColor(card.keeper) }}>
-                                    {card.effect}
+                                    {formatEffect(card.mechanics)}
                                 </span>
                             )}
                         </div>
@@ -122,7 +100,7 @@ export default function DraftOffering() {
                         <span className="keeper-name" style={{ color: '#7B4FA2' }}>The Smuggler</span>
                         <span className="keeper-tag" style={{ borderColor: '#7B4FA240', color: '#7B4FA2' }}>Dark</span>
                     </div>
-                    {offerings.dark.map((card: any) => (
+                    {offerings.dark.map((card) => (
                         <div
                             key={card.id}
                             className={`draft-card ${picked.find(c => c.id === card.id) ? 'picked' : ''}`}
@@ -131,7 +109,7 @@ export default function DraftOffering() {
                             <span className="draft-card-name">{card.name}</span>
                             {showEffect(card) && (
                                 <span className="draft-card-effect" style={{ color: cardColor(card.keeper) }}>
-                                    {card.effect}
+                                    {formatEffect(card.mechanics)}
                                 </span>
                             )}
                         </div>

@@ -19,6 +19,9 @@
         "paths": {
             "@/*": [
                 "src/*"
+            ],
+            "@data/*": [
+                "../../data/*"
             ]
         }
     },
@@ -26,6 +29,7 @@
         "src",
         "src/PhaseRouterBridge.ts",
         "src/SelectShell/index.tsx",
-        "../react_app/*.ts"
-    ]
+        "../react_app/*.ts",
+        "../react_app/*.tsx"
+    ],
 }

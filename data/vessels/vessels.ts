@@ -27,7 +27,6 @@ export type AlignmentBias = 'light' | 'dark' | 'balanced';
 
 export type DraftBias = 'light' | 'dark' | 'neutral';
 
-
 // Per-vessel mechanical knobs.
 // All fields optional — only populate what's active for this vessel.
 // Dormant fields (undefined) mean: use the baseline game value.

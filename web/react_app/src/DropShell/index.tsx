@@ -1,18 +1,27 @@
 import React from 'react';
 import { transition, getRunMeta } from '@du/phases';
+import { shouldIncrementMetaCounter, VESSELS, type VesselId } from '@data/vessels/vessels';
 import './style.css';
 
 export default function DropShell() {
     const runMeta = getRunMeta();
 
-    // Read the packet to see how they died/survived
     const rawPacket = localStorage.getItem("dudael:active_packet");
     const packet = rawPacket ? JSON.parse(rawPacket) : null;
+    const vesselId = (packet?.player?.vessel ?? 'EXILE') as VesselId;
+    const vesselConfig = VESSELS[vesselId];
 
     const levelResult = packet?.meta?.levelResult || { survived: false, points: 0 };
     const forcedDrop = packet?.meta?.forcedDrop;
 
     const survived = levelResult.survived && !forcedDrop;
+
+    // Meta progression check
+    const metaIncremented = shouldIncrementMetaCounter(vesselId, {
+        insight: runMeta?.insight ?? 0,
+        currentLight: runMeta.alignment.light,
+        currentDark: runMeta.alignment.dark,
+    });
 
     const handleReturnToStaging = () => {
         console.log("♻️ Run concluded. Looping back to Staging...");
@@ -89,6 +98,11 @@ export default function DropShell() {
                     {runMeta.depth >= 3 && <span className="unlock-badge">+1 Currency</span>}
                     {!survived && <span className="unlock-badge" style={{ borderColor: '#C04050', color: '#C04050' }}>Scar: Fractured</span>}
                     {survived && <span className="unlock-badge" style={{ borderColor: '#D4A843', color: '#D4A843' }}>Boon: Deep Memory</span>}
+                    {metaIncremented && vesselConfig.mechanics.metaCounter && (
+                        <span className="unlock-badge" style={{ borderColor: '#8BA0B5', color: '#8BA0B5' }}>
+                            +1 {vesselConfig.mechanics.metaCounter.charAt(0).toUpperCase() + vesselConfig.mechanics.metaCounter.slice(1)}
+                        </span>
+                    )}
                     {runMeta.depth < 3 && survived && <span style={{ fontSize: '9px', color: '#4A4D58' }}>No new anomalies detected.</span>}
                 </div>
             </div>

@@ -6,14 +6,14 @@ import { RootLayout } from "./RootLayout";
 import SelectShell from "./SelectShell";
 import TitleShell from "./TitleShell";
 import StagingShell from "./StagingShell";
-import DraftShell, { DraftApproach, DraftOffering, DraftReckoning, DraftRouter } from "./DraftShell";
+import { DraftLayout, DraftApproach, DraftOffering, DraftReckoning, DraftRouter } from "./DraftShell";
 import LevelShell from "./LevelShell";
 import DoorShell from "./DoorShell";
 import DropShell from "./DropShell";
 
 // side effects: boot + hotkeys + dev exchange
 import "../boot-walk";
-import DraftLayout from "./DraftShell";
+
 
 const router = createBrowserRouter([
     {
@@ -32,7 +32,6 @@ const router = createBrowserRouter([
                     { path: 'reckoning', element: <DraftReckoning /> },
                 ]
             },
-            { path: "/draft", element: <DraftShell /> },
             { path: "/level", element: <LevelShell /> },
             { path: "/door", element: <DoorShell /> },
             { path: "/drop", element: <DropShell /> }
