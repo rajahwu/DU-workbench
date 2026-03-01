@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 // Engine Imports (Adjust path to your @du/phases workspace if needed)
 import { loadUserProfile, titleExchange, commitExchange } from '@du/phases/01_title/title-exchange';
 import { DEFAULT_POOL } from '@du/phases/02_select/pool';
-import './styles.css';
+import './style.css';
 
 export default function TitleShell() {
     const [isBooting, setIsBooting] = useState(false);

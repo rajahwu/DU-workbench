@@ -9,6 +9,7 @@ export type RunMetaSnapshot = {
   depth: number;
   loopCount: number;
   alignment: Alignment;
+  insight: number;
   parity: Parity;
   inventory: string[];
   phaseHistory: PhaseId[];
@@ -37,6 +38,7 @@ const state: RunMetaSnapshot = {
   depth: 0,
   loopCount: 0,
   alignment: { light: 0, dark: 0 },
+  insight: 0,
   parity: "neutral",
   inventory: [],
   phaseHistory: ["01_title"],
