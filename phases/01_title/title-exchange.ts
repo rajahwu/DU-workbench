@@ -9,12 +9,13 @@
  * The animation calls it. The router receives it.
  */
 
-import type {
+import { UserIdentity } from "./title.types";
+
+import {
   PhasePacket,
-  UserIdentity,
   PlayerIdentity,
   SelectionPool,
-} from "./title.types";
+} from "../types";
 
 // ─────────────────────────────────────────────
 // Profile shape (what we read from storage/DB)
@@ -74,8 +75,8 @@ export function titleExchange(
       to: "02_select",
       ts,
       user,
-      selection: { pool },
-      meta: { path: "full", displayName: profile!.displayName },
+      selection: { pool, chosen: null },
+      meta: { path: "full", displayName: profile!.displayName, pool: pool.id },
     };
     return { path: "full", packet, pool };
   }

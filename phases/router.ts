@@ -1,5 +1,5 @@
 // phases/router.ts
-import type { PhaseId } from "./meta";
+import type { PhaseId } from "./types";
 import { onManagerEvent } from "./manager";
 
 export type PhaseRoute = (phase: PhaseId) => void;

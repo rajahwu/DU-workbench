@@ -12,7 +12,7 @@ export default defineConfig({
   server: {
     fs: {
       // allow importing workspace packages (like @du/phases) from outside this folder
-      allow: [path.resolve(__dirname, "../..")]
+      allow: [path.resolve(__dirname, "../..")],
     }
   }
 });

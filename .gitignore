@@ -16,6 +16,7 @@ archive
 .env
 .env.*.local
 !.env.example
+*.tsbuildinfo
 
 # Editor directories and files
 .vscode/*

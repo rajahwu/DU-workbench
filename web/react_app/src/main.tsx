@@ -5,6 +5,7 @@ import { RouterProvider, createBrowserRouter } from "react-router";
 import { RootLayout } from "./RootLayout";
 import { SelectShell } from "./SelectShell";
 import { PhaseShell } from "./PhaseShell";
+import { TitlePage } from "./TitlePage";
 
 // side effects: boot + hotkeys + dev exchange
 import "../boot-walk";
@@ -13,8 +14,8 @@ const router = createBrowserRouter([
     {
         element: <RootLayout />,
         children: [
-            { path: "/", element: <PhaseShell phase="01_title" /> },
-            { path: "/title", element: <PhaseShell phase="01_title" /> },
+            { path: "/", element: <TitlePage /> },
+            { path: "/title", element: <TitlePage /> },
             { path: "/select", element: <SelectShell /> },
             { path: "/staging", element: <PhaseShell phase="03_staging" /> },
             { path: "/draft", element: <PhaseShell phase="04_draft" /> },

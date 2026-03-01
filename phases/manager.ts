@@ -1,12 +1,6 @@
 // phases/manager.ts
-import {
-  type PhaseId,
-  getRunMeta,
-  incDepth,
-  incLoop,
-  lockIdentity,
-  pushPhase,
-} from "./meta";
+import type { PhaseId } from "./types";
+import { getRunMeta, incDepth, incLoop, lockIdentity, pushPhase } from "./meta";
 
 import type { PhasePacket } from "./types";
 export type { PhasePacket } from "./types";
