@@ -8,7 +8,7 @@
  */
 
 import { titleExchange, loadUserProfile, commitExchange } from "./title-exchange";
-import type { SelectionPool, PlayerIdentity } from "./title.types";
+import type { SelectionPool, PlayerIdentity } from "../types";
 
 // ─────────────────────────────────────────────
 // Your player pool (wire to DB / static data)

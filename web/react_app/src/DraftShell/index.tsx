@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { transition, getRunMeta } from '@du/phases';
-import './styles.css';
+import './style.css';
 
 // Master Prototype Card Pool
 const cardPool = {

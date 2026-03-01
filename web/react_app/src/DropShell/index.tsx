@@ -1,6 +1,6 @@
 import React from 'react';
 import { transition, getRunMeta } from '@du/phases';
-import './styles.css';
+import './style.css';
 
 export default function DropShell() {
     const runMeta = getRunMeta();

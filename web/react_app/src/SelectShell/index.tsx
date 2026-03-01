@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 // Import your engine transition logic
 import { transition } from '@du/phases';
-import './styles.css';
+import './style.css';
 
 // Using your exact data payloads
 const vesselData = {

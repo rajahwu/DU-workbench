@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { transition, getRunMeta } from '@du/phases';
-import './styles.css';
+import './style.css';
 
 // The data from your prototype, adapted for React state
 const phaseData = {
