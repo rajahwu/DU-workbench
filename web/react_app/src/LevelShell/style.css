@@ -1,0 +1,274 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap');
+
+.level-shell-wrapper {
+    background: #0D0E12;
+    color: #8B8FA0;
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Shared Top Bar */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #1E2028;
+}
+
+.top-bar-label {
+    font-size: 8px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: #2A2D38;
+    text-transform: uppercase;
+}
+
+.top-bar-phase {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.parity-display {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 400;
+}
+
+.parity-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 4px;
+}
+
+.parity-dot.light {
+    background: #D4A843;
+}
+
+.parity-dot.dark {
+    background: #7B4FA2;
+}
+
+/* Level Specific HUD */
+.timer-bar {
+    height: 3px;
+    background: #1E2028;
+    overflow: hidden;
+}
+
+.timer-fill {
+    height: 100%;
+    background: #D4A843;
+    transition: width 0.1s linear;
+}
+
+.timer-fill.urgent {
+    background: #C04050;
+}
+
+.hud-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 16px;
+    font-size: 9px;
+    border-bottom: 1px solid #1E2028;
+    background: #13141A;
+}
+
+.hud-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hud-label {
+    font-size: 7px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    color: #4A4D58;
+    text-transform: uppercase;
+}
+
+.hud-value {
+    font-weight: 700;
+    font-size: 12px;
+    color: #8BA0B5;
+}
+
+.health-bar-container {
+    display: flex;
+    align-items: center;
+    width: 80px;
+}
+
+.health-bar {
+    flex: 1;
+    height: 4px;
+    background: #1E2028;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.health-fill {
+    height: 100%;
+    background: #6B8F71;
+    transition: width 0.3s ease;
+    border-radius: 2px;
+}
+
+.health-fill.low {
+    background: #C04050;
+}
+
+.depth-meter {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+}
+
+.depth-pip {
+    width: 8px;
+    height: 8px;
+    border: 1px solid #1E2028;
+    border-radius: 1px;
+    transition: all 0.3s ease;
+}
+
+.depth-pip.reached {
+    background: #B8863B;
+    border-color: #B8863B;
+}
+
+.depth-pip.current {
+    background: #8B8FA0;
+    border-color: #8B8FA0;
+}
+
+/* The Game Slot */
+.level-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+}
+
+.level-header {
+    text-align: center;
+    padding: 8px 0 16px;
+}
+
+.level-name {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #C04050;
+}
+
+.level-type-tag {
+    font-size: 7px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: #4A4D58;
+    text-transform: uppercase;
+    margin-top: 4px;
+}
+
+.game-slot {
+    flex: 1;
+    background: #13141A;
+    border: 1px solid #1E2028;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    min-height: 300px;
+}
+
+/* 3x3 Tap Minigame */
+.tap-area {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 4px;
+    padding: 4px;
+}
+
+.tap-cell {
+    background: #0D0E12;
+    border: 1px solid #1E2028;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-size: 24px;
+    user-select: none;
+}
+
+.tap-cell.lit {
+    border-color: #D4A843;
+    background: rgba(212, 168, 67, 0.05);
+    animation: pulse 0.6s ease infinite;
+    color: #D4A843;
+}
+
+.tap-cell.dark-lit {
+    border-color: #7B4FA2;
+    background: rgba(123, 79, 162, 0.05);
+    animation: pulse 0.6s ease infinite;
+    color: #7B4FA2;
+}
+
+.tap-cell.hit {
+    background: #6B8F71;
+    border-color: #6B8F71;
+    color: #fff;
+}
+
+.tap-cell.miss {
+    background: #C04050;
+    border-color: #C04050;
+    color: #fff;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.02);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.system-message {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(13, 14, 18, 0.85);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    z-index: 10;
+    flex-direction: column;
+    gap: 12px;
+    text-transform: uppercase;
+}

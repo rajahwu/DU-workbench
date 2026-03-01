@@ -3,9 +3,13 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
 
 import { RootLayout } from "./RootLayout";
-import { SelectShell } from "./SelectShell";
-import { PhaseShell } from "./PhaseShell";
-import { TitlePage } from "./TitlePage";
+import SelectShell  from "./SelectShell";
+import TitleShell from "./TitleShell";
+import StagingShell from "./StagingShell";
+import DraftShell from "./DraftShell";
+import LevelShell from "./LevelShell";
+import DoorShell from "./DoorShell";
+import DropShell from "./DropShell";
 
 // side effects: boot + hotkeys + dev exchange
 import "../boot-walk";
@@ -14,14 +18,14 @@ const router = createBrowserRouter([
     {
         element: <RootLayout />,
         children: [
-            { path: "/", element: <TitlePage /> },
-            { path: "/title", element: <TitlePage /> },
+            { path: "/", element: <TitleShell /> },
+            { path: "/title", element: <TitleShell /> },
             { path: "/select", element: <SelectShell /> },
-            { path: "/staging", element: <PhaseShell phase="03_staging" /> },
-            { path: "/draft", element: <PhaseShell phase="04_draft" /> },
-            { path: "/level", element: <PhaseShell phase="05_level" /> },
-            { path: "/door", element: <PhaseShell phase="06_door" /> },
-            { path: "/drop", element: <PhaseShell phase="07_drop" /> }
+            { path: "/staging", element: <StagingShell /> },
+            { path: "/draft", element: <DraftShell /> },
+            { path: "/level", element: <LevelShell /> },
+            { path: "/door", element: <DoorShell /> },
+            { path: "/drop", element: <DropShell /> }
         ]
     }
 ]);

@@ -1,0 +1,160 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap');
+
+.door-shell-wrapper {
+    background: #0D0E12;
+    color: #8B8FA0;
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Shared Top Bar */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #1E2028;
+}
+
+.top-bar-label {
+    font-size: 8px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: #2A2D38;
+    text-transform: uppercase;
+}
+
+.top-bar-phase {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.parity-display {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 400;
+}
+
+.parity-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 4px;
+}
+
+.parity-dot.light {
+    background: #D4A843;
+}
+
+.parity-dot.dark {
+    background: #7B4FA2;
+}
+
+.content-area {
+    flex: 1;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+}
+
+.theology-line {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: #4A4D58;
+    text-align: center;
+    line-height: 1.6;
+    padding: 8px 0;
+}
+
+.section-label {
+    font-size: 7px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: #4A4D58;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+/* Door Options */
+.door-option {
+    background: #13141A;
+    border: 1px solid #1E2028;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.door-option:hover:not(.locked) {
+    background: #1A1C24;
+}
+
+.door-option:active:not(.locked) {
+    transform: scale(0.98);
+}
+
+.door-option.locked {
+    opacity: 0.25;
+    pointer-events: none;
+}
+
+.door-option-name {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+.door-option-desc {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 10px;
+    color: #4A4D58;
+    margin-top: 4px;
+}
+
+.door-cost {
+    font-size: 8px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    color: #2A2D38;
+    margin-top: 8px;
+    text-transform: uppercase;
+}
+
+.door-cost .required {
+    font-weight: 700;
+}
+
+.btn-danger {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 2px;
+    text-align: center;
+    background: #C04050;
+    color: #fff;
+    margin-top: 16px;
+}
+
+.btn-danger:hover {
+    background: #A03040;
+}

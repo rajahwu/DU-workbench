@@ -1,0 +1,136 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap');
+
+.drop-shell-wrapper {
+    background: #0D0E12;
+    color: #8B8FA0;
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Shared UI */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #1E2028;
+}
+
+.top-bar-label {
+    font-size: 8px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: #2A2D38;
+    text-transform: uppercase;
+}
+
+.top-bar-phase {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.content-area {
+    flex: 1;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+}
+
+.theology-line {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: #4A4D58;
+    text-align: center;
+    line-height: 1.6;
+    padding: 8px 0;
+}
+
+.section-label {
+    font-size: 7px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: #4A4D58;
+    text-transform: uppercase;
+    margin-top: 12px;
+    margin-bottom: 6px;
+}
+
+/* Drop Specifics */
+.drop-summary {
+    background: #13141A;
+    border: 1px solid #1E2028;
+    padding: 16px;
+}
+
+.drop-stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #1A1C24;
+    font-size: 10px;
+}
+
+.drop-stat:last-child {
+    border-bottom: none;
+}
+
+.drop-stat-label {
+    color: #4A4D58;
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.drop-stat-value {
+    font-weight: 700;
+}
+
+.unlock-badge {
+    display: inline-block;
+    padding: 6px 10px;
+    font-size: 8px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    border: 1px solid #6B8F71;
+    color: #6B8F71;
+    margin: 4px 4px 0 0;
+    background: rgba(107, 143, 113, 0.05);
+}
+
+.bottom-action {
+    padding: 12px 16px;
+    border-top: 1px solid #1E2028;
+    background: #0D0E12;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 2px;
+    background: #2A2D38;
+    color: #8B8FA0;
+    text-align: center;
+}
+
+.btn-primary:hover {
+    background: #4A4D58;
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}

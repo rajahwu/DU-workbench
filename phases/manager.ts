@@ -29,11 +29,11 @@ export type PhaseManagerEvent =
 const LEGAL: Record<PhaseId, PhaseId[]> = {
   "01_title": ["02_select"],
   "02_select": ["03_staging"],
-  "03_staging": ["04_draft", "02_select"], // allow return to re-pick
+  "03_staging": ["04_draft", "02_select"],
   "04_draft": ["05_level", "03_staging"],
-  "05_level": ["06_door", "03_staging"],
+  "05_level": ["06_door", "03_staging", "07_drop"], // Added 07_drop for Level Deaths
   "06_door": ["04_draft", "03_staging", "07_drop"],
-  "07_drop": ["04_draft", "01_title"], // drop can loop or reset
+  "07_drop": ["04_draft", "01_title", "03_staging"], // Added 03_staging to loop back after summary
 };
 
 const target = new EventTarget();
