@@ -8,7 +8,8 @@ import {
   pushPhase,
 } from "./meta";
 
-export type { PhasePacket } from "./01_title/title.types";
+import type { PhasePacket } from "./types";
+export type { PhasePacket } from "./types";
 
 export type PhaseManagerEvent =
   | {
@@ -75,8 +76,8 @@ function applySideEffects(from: PhaseId, to: PhaseId, packet?: PhasePacket) {
   if (from === "02_select" && to === "03_staging") {
     lockIdentity({
       userId: packet?.user?.id,
-      vessel: packet?.player?.vessel,
-      sigil: packet?.player?.sigil,
+      vessel: packet?.identity?.vessel ?? packet?.player?.vessel,
+      sigil: packet?.identity?.sigil ?? packet?.player?.sigil,
     });
   }
 

@@ -1,14 +1,7 @@
 // phases/meta.ts
-export type PhaseId =
-  | "01_title"
-  | "02_select"
-  | "03_staging"
-  | "04_draft"
-  | "05_level"
-  | "06_door"
-  | "07_drop";
+import type { PhaseId, Alignment } from "./types";
+export type { PhaseId, Alignment } from "./types";
 
-export type Alignment = { light: number; dark: number };
 export type Parity = "light" | "dark" | "neutral";
 
 export type RunMetaSnapshot = {
