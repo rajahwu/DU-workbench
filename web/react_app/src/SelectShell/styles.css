@@ -1,0 +1,347 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Crimson+Pro:ital,wght@0,400;1,400&display=swap');
+
+.vessel-registry-wrapper {
+    background: #0D0E12;
+    color: #6B7B8D;
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Scanline overlay */
+.vessel-registry-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px,
+            rgba(13, 14, 18, 0.03) 2px, rgba(13, 14, 18, 0.03) 4px);
+    pointer-events: none;
+    z-index: 100;
+}
+
+.registry-header {
+    padding: 32px 40px 24px;
+    border-bottom: 1px solid #1A1C24;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.registry-title {
+    font-size: 9px;
+    font-weight: 300;
+    letter-spacing: 3px;
+    color: #4A4D58;
+    text-transform: uppercase;
+}
+
+.registry-title span {
+    color: #6B7B8D;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 4px;
+    display: block;
+    margin-top: 4px;
+}
+
+.registry-meta {
+    text-align: right;
+    font-size: 7px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    color: #3A3D48;
+    line-height: 1.8;
+}
+
+.vessel-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: #1A1C24;
+    margin: 1px;
+}
+
+.vessel-cell {
+    background: #0D0E12;
+    padding: 20px 16px;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.vessel-cell::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.vessel-cell:hover::before,
+.vessel-cell.active::before {
+    opacity: 1;
+}
+
+.vessel-cell:hover,
+.vessel-cell.active {
+    background: #10111A;
+}
+
+.vessel-cell[data-vessel="seraph"]::before {
+    background: #D4A843;
+}
+
+.vessel-cell[data-vessel="shadow"]::before {
+    background: #7B4FA2;
+}
+
+.vessel-cell[data-vessel="exile"]::before {
+    background: #8BA0B5;
+}
+
+.vessel-cell[data-vessel="penitent"]::before {
+    background: #D4A04A;
+}
+
+.vessel-cell[data-vessel="rebel"]::before {
+    background: #C04050;
+}
+
+.vessel-label {
+    font-size: 6px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: #3A3D48;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.vessel-name {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    transition: color 0.4s ease;
+}
+
+.vessel-subtitle {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 9px;
+    color: #3A3D48;
+    margin-top: 6px;
+}
+
+.vessel-bias {
+    font-size: 6px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    color: #2A2D38;
+    margin-top: 8px;
+}
+
+.vessel-cell[data-vessel="seraph"].active .vessel-name,
+.vessel-cell[data-vessel="seraph"]:hover .vessel-name {
+    color: #D4A843;
+}
+
+.vessel-cell[data-vessel="shadow"].active .vessel-name,
+.vessel-cell[data-vessel="shadow"]:hover .vessel-name {
+    color: #7B4FA2;
+}
+
+.vessel-cell[data-vessel="exile"].active .vessel-name,
+.vessel-cell[data-vessel="exile"]:hover .vessel-name {
+    color: #8BA0B5;
+}
+
+.vessel-cell[data-vessel="penitent"].active .vessel-name,
+.vessel-cell[data-vessel="penitent"]:hover .vessel-name {
+    color: #D4A04A;
+}
+
+.vessel-cell[data-vessel="rebel"].active .vessel-name,
+.vessel-cell[data-vessel="rebel"]:hover .vessel-name {
+    color: #C04050;
+}
+
+.display-area {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    min-height: calc(100vh - 200px);
+}
+
+.sigil-viewport {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid #1A1C24;
+    padding: 40px;
+    position: relative;
+}
+
+.sigil-viewport svg {
+    width: 100%;
+    max-width: 360px;
+    height: auto;
+    animation: fadeIn 0.6s ease forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.data-panel {
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.data-section {
+    border-left: 1px solid #1A1C24;
+    padding-left: 16px;
+}
+
+.data-label {
+    font-size: 7px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: #3A3D48;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.data-value {
+    font-size: 11px;
+    font-weight: 400;
+    color: #6B7B8D;
+    line-height: 1.8;
+}
+
+.data-value strong {
+    font-weight: 700;
+}
+
+.stat-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 0;
+}
+
+.stat-label {
+    font-size: 7px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    color: #4A4D58;
+    width: 60px;
+    text-transform: uppercase;
+}
+
+.stat-bar {
+    flex: 1;
+    height: 3px;
+    background: #1A1C24;
+    position: relative;
+    max-width: 200px;
+}
+
+.stat-fill {
+    height: 100%;
+    transition: width 0.8s ease, background-color 0.4s ease;
+}
+
+.stat-value {
+    font-size: 7px;
+    font-weight: 300;
+    color: #3A3D48;
+    width: 24px;
+    text-align: right;
+}
+
+.theology-note {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: #4A4D58;
+    line-height: 1.8;
+    max-width: 400px;
+}
+
+.asset-table {
+    font-size: 8px;
+    color: #3A3D48;
+    line-height: 2.2;
+}
+
+.asset-table .prefix {
+    color: #4A4D58;
+    font-weight: 700;
+}
+
+.spectral-footer {
+    height: 2px;
+    margin: 0 40px;
+    transition: background 0.6s ease;
+}
+
+.classification-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 7px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    border: 1px solid;
+    margin-right: 8px;
+    margin-top: 4px;
+}
+
+/* The Action Button */
+.lock-button {
+    margin-top: auto;
+    align-self: flex-start;
+    padding: 12px 24px;
+    background: transparent;
+    border: 1px solid;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.lock-button:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 900px) {
+    .vessel-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    .display-area {
+        grid-template-columns: 1fr;
+    }
+
+    .sigil-viewport {
+        border-right: none;
+        border-bottom: 1px solid #1A1C24;
+    }
+}
