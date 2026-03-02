@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { transition, getRunMeta } from '@du/phases';
+import { getRunMeta, PhasePacket } from '@du/phases';
+import { useAppDispatch } from "@/app/hooks";
+import { requestTransition } from "@/app/phaseSlice";
 import './style.css';
 
 // The data from your prototype, adapted for React state
@@ -26,6 +28,7 @@ const phasesList = [
 export default function StagingShell() {
     const [activePhaseId, setActivePhaseId] = useState<keyof typeof phaseData>('staging');
     const activeData = phaseData[activePhaseId];
+    const dispatch = useAppDispatch();
 
     // Pull live run stats from the engine
     const runMeta = getRunMeta();
@@ -35,15 +38,15 @@ export default function StagingShell() {
         const rawPacket = localStorage.getItem("dudael:active_packet");
         const packet = rawPacket ? JSON.parse(rawPacket) : { ts: Date.now() };
 
-        const updatedPacket = {
+        const updatedPacket: PhasePacket = {
             ...packet,
             from: "03_staging",
             to: "04_draft"
         };
 
-        transition("04_draft", updatedPacket);
+        dispatch(requestTransition("04_draft", updatedPacket));
     };
-
+    
     return (
         <div className="staging-shell-wrapper">
             <div className="header">

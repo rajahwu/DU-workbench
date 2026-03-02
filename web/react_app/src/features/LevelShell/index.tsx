@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { transition, getRunMeta } from '@du/phases';
+import { getRunMeta, PhasePacket } from '@du/phases';
 import { VESSELS, getLevelCombatDeltas, type VesselId } from '@data/vessels/vessels';
+import { useAppDispatch } from "@/app/hooks";
+import { requestTransition } from "@/app/phaseSlice";
 import './style.css';
 
 const levelNames = ['The Threshold', 'The Hollow', 'The Furnace', 'The Archive', 'Dudael Core'];
@@ -31,6 +33,7 @@ export default function LevelShell() {
     // 3x3 Grid State
     const [litCell, setLitCell] = useState<{ idx: number, type: 'light' | 'dark' } | null>(null);
     const [cellEffects, setCellEffects] = useState<Record<number, 'hit' | 'miss'>>({});
+    const dispatch = useAppDispatch();
 
     // Ref for safe tracking inside intervals
     const stateRef = useRef({ health, points, tapsHit: 0, missCount: 0, tapsNeeded: 5 + (depth * 2) });
@@ -82,25 +85,24 @@ export default function LevelShell() {
         setGameActive(false);
         setGameOverMsg(msg);
         setLitCell(null);
-
+        
         setTimeout(() => {
             const rawPacket = localStorage.getItem("dudael:active_packet");
             const packet = rawPacket ? JSON.parse(rawPacket) : { ts: Date.now() };
 
-            const targetPhase = survived ? "06_door" : "07_drop";
+            // const targetPhase = survived ? "06_door" : "07_drop";
 
             // Pass the results forward
-            const updatedPacket = {
+            const updatedPacket: PhasePacket = {
                 ...packet,
                 from: "05_level",
-                to: targetPhase,
+                to: "06_door",
                 meta: {
                     ...packet.meta,
                     levelResult: { survived, points: stateRef.current.points }
                 }
             };
-
-            transition(targetPhase as any, updatedPacket);
+            dispatch(requestTransition("06_door", updatedPacket));
         }, 2000); // Wait 2 seconds so player sees the outcome
     };
 

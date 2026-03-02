@@ -1,10 +1,13 @@
-import React from 'react';
-import { transition, getRunMeta } from '@du/phases';
+import { getRunMeta } from '@du/phases';
 import { getDoorCosts, getSecretDoorThreshold, type VesselId } from '@data/vessels/vessels';
+import type { PhasePacket, PhaseId } from '@du/phases/types';
+import { useAppDispatch } from "@/app/hooks";
+import { requestTransition } from "@/app/phaseSlice";
 import './style.css';
 
 export default function DoorShell() {
     const runMeta = getRunMeta();
+    const dispatch = useAppDispatch();
 
     const light = runMeta.alignment.light;
     const dark = runMeta.alignment.dark;
@@ -29,9 +32,9 @@ export default function DoorShell() {
         const packet = rawPacket ? JSON.parse(rawPacket) : { ts: Date.now() };
 
         // If they hit max depth, they extract safely. Otherwise, inner loop back to Draft.
-        const targetPhase = isMaxDepth ? "07_drop" : "04_draft";
+        const targetPhase= isMaxDepth ? "07_drop" : "04_dr aft" as PhaseId;
 
-        const updatedPacket = {
+        const updatedPacket: PhasePacket = {
             ...packet,
             from: "06_door",
             to: targetPhase,
@@ -41,7 +44,7 @@ export default function DoorShell() {
             }
         };
 
-        transition(targetPhase as any, updatedPacket);
+        dispatch(requestTransition(targetPhase, updatedPacket));
     };
 
     const handleForcedDrop = () => {
@@ -56,7 +59,7 @@ export default function DoorShell() {
             meta: { ...packet.meta, forcedDrop: true }
         };
 
-        transition("07_drop", updatedPacket);
+        dispatch(requestTransition("07_drop", updatedPacket));
     };
 
     return (

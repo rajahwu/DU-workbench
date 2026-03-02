@@ -9,6 +9,14 @@ function normalize(pathname: string) {
   return clean === "/" ? "/title" : clean;
 }
 
+function isWithin(desired: string, current: string) {
+  if (current === desired) return true;
+  // allow nested routes like /draft/approach when desired is /draft
+  return current.startsWith(desired + "/");
+}
+
+
+
 export function PhaseRouterBridge() {
   const phase = useAppSelector(selectPhase);
   const navigate = useNavigate();
@@ -18,10 +26,11 @@ export function PhaseRouterBridge() {
     const desired = phaseToPath(phase);
     const current = normalize(location.pathname);
 
-    if (current !== desired) {
+    if (!isWithin(desired, current)) {
       navigate(desired, { replace: true });
     }
   }, [phase, location.pathname, navigate]);
-
+  
   return null;
 }
+

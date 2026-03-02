@@ -33,7 +33,7 @@ const LEGAL: Record<PhaseId, PhaseId[]> = {
   "02_select": ["03_staging"],
   "03_staging": ["04_draft", "02_select"],
   "04_draft": ["05_level", "03_staging"],
-  "05_level": ["06_door", "03_staging", "07_drop"], // Level deaths supported
+  "05_level": ["06_door"], // Summary -> door only
   "06_door": ["04_draft", "03_staging", "07_drop"],
   "07_drop": ["04_draft", "01_title", "03_staging"], // Summary -> staging allowed
 };

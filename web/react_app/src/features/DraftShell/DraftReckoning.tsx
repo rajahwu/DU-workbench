@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import { transition, getRunMeta } from '@du/phases';
+import { useAppDispatch } from "@/app/hooks";
+import { requestTransition } from "@/app/phaseSlice";
 import { formatEffect } from '@data/cards/pool';
 import type { DraftCard } from '@data/cards/types';
 
@@ -79,6 +81,7 @@ export default function DraftReckoning() {
         return 'Parity balanced. Both paths remain open.';
     })();
 
+    const dispatch   = useAppDispatch();
     // ── Enter the Depth ──────────────────────────────────────────────────────
     const handleEnterDepth = () => {
         const rawPacket = localStorage.getItem('dudael:active_packet');
@@ -94,10 +97,10 @@ export default function DraftReckoning() {
                 paritySnapshot: { light: newLight, dark: newDark },
             },
         };
-
-        transition('05_level', updatedPacket);
+        
+        dispatch(requestTransition("05_level", updatedPacket));
     };
-
+    
     return (
         <>
             <div className="content-area">

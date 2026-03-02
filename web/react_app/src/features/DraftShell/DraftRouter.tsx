@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import { useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router';
 
 // DraftRouter is the index route for /04_draft.
 // On mount it immediately navigates to the first stage.
@@ -7,13 +7,16 @@ import { useNavigate } from 'react-router';
 
 export default function DraftRouter() {
     const navigate = useNavigate();
-
+    const location = useLocation();
+    const didRedirect = useRef(false);
+    
     useEffect(() => {
-        if (window.location.pathname.endsWith('/draft')) {
-            navigate('/draft/approach', { replace: true });
-        } 
-
-    }, [navigate]);
+        if (didRedirect.current) return;
+        if (location.pathname === "/draft") {
+            didRedirect.current = true;
+            navigate("/draft/approach", { replace: true });
+        }
+    }, [location.pathname, navigate]);
 
     return null;
 }

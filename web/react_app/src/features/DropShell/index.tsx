@@ -1,10 +1,13 @@
 import React from 'react';
-import { transition, getRunMeta } from '@du/phases';
+import { getRunMeta, PhasePacket } from '@du/phases';
 import { shouldIncrementMetaCounter, VESSELS, type VesselId } from '@data/vessels/vessels';
+import { useAppDispatch } from "@/app/hooks";
+import { requestTransition } from "@/app/phaseSlice";
 import './style.css';
 
 export default function DropShell() {
     const runMeta = getRunMeta();
+    const dispatch = useAppDispatch();
 
     const rawPacket = localStorage.getItem("dudael:active_packet");
     const packet = rawPacket ? JSON.parse(rawPacket) : null;
@@ -28,7 +31,7 @@ export default function DropShell() {
 
         // In a full implementation, you'd trigger a Supabase write here to save meta-progression
 
-        const newPacket = {
+        const newPacket: PhasePacket = {
             from: "07_drop",
             to: "03_staging",
             ts: Date.now(),
@@ -40,7 +43,7 @@ export default function DropShell() {
         };
 
         // Transition back to the locker room
-        transition("03_staging", newPacket as any);
+        dispatch(requestTransition("03_staging", newPacket));
     };
 
     return (

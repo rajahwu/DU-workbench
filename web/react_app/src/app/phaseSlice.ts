@@ -2,14 +2,15 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { PhaseId, PhasePacket } from "@du/phases";
 import { transition as engineTransition } from "@du/phases";
-import { restoreSnapshot, hydrateFromSnapshot, getRunMeta } from "@du/phases/meta";
+import { restoreSnapshot, hydrateFromSnapshot, getRunMeta, type RunMetaSnapshot } from "@du/phases/meta";
+
 import type { AppDispatch, RootState } from "./store";
 
 type PhaseState = {
   current: PhaseId;
   lastError?: string;
   // keep the meta snapshot here so UI can read it easily
-  meta: ReturnType<typeof getRunMeta>;
+  meta: Readonly<RunMetaSnapshot>;
 };
 
 const snap = restoreSnapshot();
@@ -55,11 +56,11 @@ export function requestTransition(to: PhaseId, packet?: Partial<PhasePacket>) {
 
     const fullPacket: PhasePacket | undefined = packet
       ? ({
-          from,
-          to,
-          ts: Date.now(),
-          ...packet,
-        } as PhasePacket)
+        ...packet,
+        from,
+        to,
+        ts: Date.now(),
+      } as PhasePacket)
       : undefined;
 
     const result = engineTransition(from, to, fullPacket);
@@ -70,7 +71,6 @@ export function requestTransition(to: PhaseId, packet?: Partial<PhasePacket>) {
     }
 
     dispatch(setPhase(result.phase));
-    dispatch(syncMeta());
 
     return result;
   };

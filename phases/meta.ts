@@ -55,7 +55,8 @@ export function initRunMeta(sessionId: string, seed?: Partial<RunMetaSnapshot>) 
 }
 
 export function getRunMeta(): Readonly<RunMetaSnapshot> {
-  return state;
+  // return a copy so consumers can't freeze/mutate engine state
+  return structuredClone(state);
 }
 
 export function pushPhase(phase: PhaseId) {

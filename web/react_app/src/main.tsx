@@ -3,7 +3,6 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
 import { Provider } from "react-redux";
 import { store } from "@/app/store";
-
 import { RootLayout } from "@/RootLayout";
 import SelectShell from "@/features/SelectShell";
 import TitleShell from "@/features/TitleShell";

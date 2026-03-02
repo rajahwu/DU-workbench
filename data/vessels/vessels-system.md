@@ -77,6 +77,8 @@ Right now `handleLockVessel` only writes `vessel: activeVesselId`. Have it also 
 
 ```ts
 import { VESSELS } from '@/app/data/vessels';
+import { useAppDispatch } from "./app/hooks";
+import { requestTransition } from "./app/phaseSlice";
 
 const handleLockVessel = () => {
   const rawPacket = localStorage.getItem("dudael:active_packet");
@@ -103,7 +105,8 @@ const handleLockVessel = () => {
     },
   };
 
-  transition("03_staging", updatedPacket);
+disptch(requestTransition({phase:"03_staging", packet: updatedPacke }))
+  
 };
 ```
 

@@ -4,6 +4,7 @@ import { requestTransition } from "@/app/phaseSlice";
 import { type VesselId, buildVesselPacketStats } from '@data/vessels/vessels';
 import './style.css';
 import { type VesselDataRecordKey, VESSEL_DATA as vesselData } from '@data/vessels/data';
+import { PhasePacket } from '@du/phases/01_title/title.types';
 // Using your exact data payloads
 
 const svgTemplates = {
@@ -28,7 +29,7 @@ export default function SelectShell() {
 
     const stats = buildVesselPacketStats(engineId);
 
-    const updatedPacket = {
+    const updatedPacket: PhasePacket = {
       ...packet,
       from: "02_select",
       to: "03_staging",
@@ -38,8 +39,9 @@ export default function SelectShell() {
         stats,
       }
     };
+    
+    dispatch(requestTransition("03_staging", updatedPacket));
 
-    dispatch(requestTransition("03_staging", updatedPacket as any));
   };
 
   return (
