@@ -304,7 +304,7 @@ export function getVesselConfig(id: VesselId | null | undefined): VesselConfig |
 
 // Build the compact stats object written into packet.player.stats on Lock Vessel.
 export function buildVesselPacketStats(id: VesselId): VesselPacketStats {
-    const config = VESSELS[id];
+    const config = VESSELS[id] ?? VESSELS['SERAPH']; // fallback to SERAPH if vesselId is invalid
     return {
         vesselId: id,
         startingLight: config.startingLight,
@@ -358,7 +358,7 @@ export function getDoorCosts(
     vesselId: VesselId,
     depth: number
 ): { lightCost: number; darkCost: number; secretVisible: boolean; currentDark: number; currentLight: number } {
-    const config = VESSELS[vesselId];
+    const config = VESSELS[vesselId] ?? VESSELS['SERAPH']; // fallback to SERAPH if vesselId is invalid
     const m = config.mechanics;
 
     const baseCost = depth + 1;
@@ -384,7 +384,8 @@ export function getLevelCombatDeltas(vesselId: VesselId): {
     missForgivenessEveryN: number | null;
     perfectLevelHeal: number;
 } {
-    const m = VESSELS[vesselId].mechanics;
+    const config = VESSELS[vesselId] ?? VESSELS['SERAPH']; // fallback to SERAPH if vesselId is invalid
+    const m = config.mechanics;
     return {
         pointsPerHit: 1 + (m.extraPointsPerHit ?? 0),
         damagePerMiss: 1 + (m.extraDamagePerMiss ?? 0),
@@ -399,7 +400,7 @@ export function shouldIncrementMetaCounter(
     vesselId: VesselId,
     endOfRunState: { insight: number; currentLight: number; currentDark: number }
 ): boolean {
-    const config = VESSELS[vesselId];
+    const config = VESSELS[vesselId] ?? VESSELS['SERAPH']; // fallback to SERAPH if vesselId is invalid
     const condition = config.mechanics.metaCounterCondition;
     if (!condition || !config.mechanics.metaCounter) return false;
 
@@ -417,7 +418,8 @@ export function shouldIncrementMetaCounter(
 
 // Get the secret door threshold for a vessel (with fallback to game default).
 export function getSecretDoorThreshold(vesselId: VesselId): number {
-    return VESSELS[vesselId].mechanics.secretDoorThreshold ?? 3;
+    var config = VESSELS[vesselId] ?? VESSELS['SERAPH']; // fallback to SERAPH if vesselId is invalid
+    return config?.mechanics?.secretDoorThreshold ?? 3;
 }
 
 

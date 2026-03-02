@@ -1,4 +1,4 @@
-import { VesselId } from './vessels';
+import { VesselId, VesselMechanics } from './vessels';
 
 export type VesselData = {
     id: VesselId;
@@ -16,6 +16,7 @@ export type VesselData = {
     playstyle: string;   // for flavor text and potential UI use
     tags: string[];      // for flavor text and potential UI use
     assets: string[];    // for flavor text and potential UI use
+    mechanics?: VesselMechanics[]; // optional field for any specific mechanics or keywords associated with the vessel
 }; // placeholder for any additional data we want to track per vessel in the packet
 
 export type VesselDataRecordKey = 'seraph' | 'shadow' | 'exile' | 'penitent' | 'rebel';

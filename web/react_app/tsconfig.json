@@ -22,13 +22,22 @@
             ],
             "@data/*": [
                 "../../data/*"
+            ],
+            "@features/*": [
+                "src/features/*"
+            ],
+            "@components/*": [
+                "src/components/*"
+            ],
+            "@app/*": [
+                "src/app/*"
             ]
         }
     },
     "include": [
         "src",
         "src/PhaseRouterBridge.ts",
-        "src/SelectShell/index.tsx",
+        "src/features/SelectShell/index.tsx",
         "../react_app/*.ts",
         "../react_app/*.tsx"
     ],

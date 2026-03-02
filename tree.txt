@@ -1,0 +1,63 @@
+.
+├── README.md
+├── api
+│   └── routes
+├── cli
+│   └── terminal_app
+├── config
+│   └── environments
+├── data
+│   ├── cards
+│   ├── entities
+│   ├── index.ts
+│   ├── lore
+│   ├── package.json
+│   └── vessels
+├── db
+│   ├── migrations
+│   └── schema
+├── game
+│   ├── cartridges
+│   ├── core
+│   ├── docs
+│   ├── interfaces
+│   └── systems
+├── node_modules
+│   ├── @eslint
+│   ├── @eslint-community
+│   ├── @tanstack
+│   ├── @typescript-eslint
+│   ├── eslint -> .pnpm/eslint@9.39.3_jiti@2.6.1/node_modules/eslint
+│   ├── eslint-plugin-react-hooks -> .pnpm/eslint-plugin-react-hooks@7.0.1_eslint@9.39.3_jiti@2.6.1_/node_modules/eslint-plugin-react-hooks
+│   ├── eslint-plugin-react-refresh -> .pnpm/eslint-plugin-react-refresh@0.4.26_eslint@9.39.3_jiti@2.6.1_/node_modules/eslint-plugin-react-refresh
+│   ├── eslint-plugin-storybook -> .pnpm/eslint-plugin-storybook@10.2.13_eslint@9.39.3_jiti@2.6.1__storybook@10.2.13_@testing-library+_l7zg5hwzqav5sxclg3lcydtnwa/node_modules/eslint-plugin-storybook
+│   ├── eslint-scope -> .pnpm/eslint-scope@8.4.0/node_modules/eslint-scope
+│   ├── eslint-visitor-keys -> .pnpm/eslint-visitor-keys@4.2.1/node_modules/eslint-visitor-keys
+│   └── typescript-eslint -> .pnpm/typescript-eslint@8.56.1_eslint@9.39.3_jiti@2.6.1__typescript@5.9.3/node_modules/typescript-eslint
+├── package.json
+├── phases
+│   ├── 01_title
+│   ├── 02_select
+│   ├── 03_staging
+│   ├── 04_draft
+│   ├── 05_level
+│   ├── 06_door
+│   ├── 07_drop
+│   ├── boot.ts
+│   ├── candy.md
+│   ├── hourglass_router
+│   ├── index.ts
+│   ├── manager.ts
+│   ├── meta.ts
+│   ├── node_modules
+│   ├── package.json
+│   ├── router.ts
+│   ├── tree.md
+│   └── types.ts
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+├── tree.txt
+└── web
+    └── react_app
+
+45 directories, 16 files

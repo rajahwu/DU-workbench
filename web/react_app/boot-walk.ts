@@ -1,17 +1,12 @@
-import { boot } from "@du/phases";
-import { installPhaseWalkHotkeys } from "./dev-walk";
+// web/react_app/boot-walk.ts (or wherever)
+import { store } from "@/app/store";
+import { requestTransition } from "@/app/phaseSlice";
+import { setPhase } from "@/app/phaseSlice";
 
-boot();
-installPhaseWalkHotkeys();
 
-// DEV ONLY: optional bypass. keep it off by default.
-const DEV_BYPASS = false;
-
-if (DEV_BYPASS && !sessionStorage.getItem("dudael:dev_started")) {
-  sessionStorage.setItem("dudael:dev_started", "1");
-  window.dispatchEvent(
-    new CustomEvent("dudael:exchange", {
-      detail: { from: "01_title", to: "02_select", ts: Date.now(), user: { id: "guest" } },
-    })
-  );
-}
+window.addEventListener("keydown", (e) => {
+  store.dispatch(setPhase("06_door"));
+  if (e.shiftKey && e.key === "3") {
+    store.dispatch(requestTransition("03_staging"));
+  }
+});

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { transition } from '@du/phases';
+import { useAppDispatch } from "@/app/hooks";
+import { requestTransition } from "@/app/phaseSlice";
 import { type VesselId, buildVesselPacketStats } from '@data/vessels/vessels';
 import './style.css';
 import { type VesselDataRecordKey, VESSEL_DATA as vesselData } from '@data/vessels/data';
@@ -16,6 +17,7 @@ const svgTemplates = {
 export default function SelectShell() {
   const [activeVesselId, setActiveVesselId] = useState<VesselDataRecordKey>('seraph');
   const activeData = vesselData[activeVesselId];
+  const dispatch = useAppDispatch();
 
   const handleLockVessel = () => {
     const engineId = activeVesselId.toUpperCase() as VesselId;
@@ -37,7 +39,7 @@ export default function SelectShell() {
       }
     };
 
-    transition("03_staging", updatedPacket);
+    dispatch(requestTransition("03_staging", updatedPacket as any));
   };
 
   return (

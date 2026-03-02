@@ -1,7 +1,11 @@
 // phases/boot.ts
-import { initRunMeta, restoreSnapshot, hydrateFromSnapshot, clearSnapshot } from "./meta";
-import type { PhasePacket } from "./types";
-import { initManager, transition } from "./manager";
+import {
+  initRunMeta,
+  restoreSnapshot,
+  hydrateFromSnapshot,
+  clearSnapshot,
+} from "./meta";
+import type { PhaseId, PhasePacket } from "./types";
 
 const ACTIVE_PACKET_KEY = "dudael:active_packet";
 
@@ -20,14 +24,12 @@ function validatePacket(p: unknown): p is PhasePacket {
   if (typeof from !== "string" || typeof to !== "string") return false;
   if (typeof ts !== "number" || !Number.isFinite(ts)) return false;
 
-  // optional validation, per your rules:
   if (p["user"] && !isObject(p["user"])) return false;
 
   return true;
 }
 
 function sessionIdFromPacket(packet: PhasePacket) {
-  // keep it deterministic across reloads
   const uid = packet.user?.id ?? "guest";
   return `run_${uid}_${Math.floor(packet.ts)}`;
 }
@@ -51,24 +53,45 @@ export function readActivePacket(): PhasePacket | null {
   }
 }
 
-export function recoverRun(): { ok: boolean; reason?: string } {
+/**
+ * Recover run meta from sessionStorage snapshot.
+ * NOTE: This no longer initializes or sets phase in any manager.
+ * The surface (Redux) is authoritative for current phase.
+ */
+export function recoverRun(): { ok: boolean; phase?: PhaseId; reason?: string } {
   const snap = restoreSnapshot();
   if (!snap) return { ok: false, reason: "no_snapshot" };
+
   hydrateFromSnapshot(snap);
-  initManager(snap.phaseHistory[snap.phaseHistory.length - 1] ?? "01_title");
-  return { ok: true };
+
+  const last =
+    (snap.phaseHistory?.[snap.phaseHistory.length - 1] as PhaseId | undefined) ??
+    "01_title";
+
+  return { ok: true, phase: last };
 }
 
+/**
+ * Boot wires packet exchange → run meta seeding, then emits an event for the UI layer
+ * to perform the actual transition via Redux.
+ */
 export function boot() {
   // Try to recover first (page reload mid-descent)
   const recovered = recoverRun();
   if (!recovered.ok) {
-    // fresh start
     clearSnapshot();
+  } else {
+    // Optional: let surface know what phase we think we're in from snapshot
+    window.dispatchEvent(
+      new CustomEvent("dudael:boot_recovered", {
+        detail: { phase: recovered.phase },
+      })
+    );
   }
 
   window.addEventListener("dudael:exchange", (e) => {
     const detail = (e as CustomEvent<ExchangeEventDetail>).detail;
+
     if (!validatePacket(detail)) {
       window.dispatchEvent(
         new CustomEvent("dudael:boot_error", {
@@ -81,16 +104,19 @@ export function boot() {
     // store for other subsystems
     commitActivePacket(detail);
 
-    // init run meta + manager
+    // init run meta (authoritative timeline for the run)
     const sid = sessionIdFromPacket(detail);
     initRunMeta(sid, {
       phaseHistory: [detail.from],
-      // you can seed alignment/depth/inventory here if your packet includes them
+      // seed alignment/depth/inventory here if packet includes them later
     });
 
-    initManager(detail.from);
-
-    // first transition (usually title -> select)
-    transition(detail.to, detail);
+    // IMPORTANT: do NOT transition here anymore.
+    // Tell the surface to request the transition via Redux.
+    window.dispatchEvent(
+      new CustomEvent("dudael:boot_packet", {
+        detail,
+      })
+    );
   });
 }

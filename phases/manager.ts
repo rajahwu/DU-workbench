@@ -1,70 +1,52 @@
 // phases/manager.ts
-import type { PhaseId } from "./types";
-import { getRunMeta, incDepth, incLoop, lockIdentity, pushPhase } from "./meta";
+import type { PhaseId, PhasePacket } from "./types";
+import {
+  getRunMeta,
+  incDepth,
+  incLoop,
+  lockIdentity,
+  pushPhase,
+} from "./meta";
 
-import type { PhasePacket } from "./types";
 export type { PhasePacket } from "./types";
 
-export type PhaseManagerEvent =
+export type PhaseManagerResult =
   | {
-      type: "phase:enter";
-      phase: PhaseId;
-      from: PhaseId;
-      ts: number;
-    }
+    ok: true;
+    from: PhaseId;
+    to: PhaseId;
+    phase: PhaseId;
+    meta: ReturnType<typeof getRunMeta>;
+    ts: number;
+  }
   | {
-      type: "phase:illegal";
-      from: PhaseId;
-      to: PhaseId;
-      reason: string;
-      ts: number;
-    }
-  | {
-      type: "phase:transition";
-      from: PhaseId;
-      to: PhaseId;
-      ts: number;
-    };
+    ok: false;
+    from: PhaseId;
+    to: PhaseId;
+    reason: "illegal_move";
+    detail: string;
+    ts: number;
+  };
 
 const LEGAL: Record<PhaseId, PhaseId[]> = {
   "01_title": ["02_select"],
   "02_select": ["03_staging"],
   "03_staging": ["04_draft", "02_select"],
   "04_draft": ["05_level", "03_staging"],
-  "05_level": ["06_door", "03_staging", "07_drop"], // Added 07_drop for Level Deaths
+  "05_level": ["06_door", "03_staging", "07_drop"], // Level deaths supported
   "06_door": ["04_draft", "03_staging", "07_drop"],
-  "07_drop": ["04_draft", "01_title", "03_staging"], // Added 03_staging to loop back after summary
+  "07_drop": ["04_draft", "01_title", "03_staging"], // Summary -> staging allowed
 };
 
-const target = new EventTarget();
-
-let current: PhaseId = "01_title";
-let initialized = false;
-
-export function initManager(startPhase: PhaseId = "01_title") {
-  current = startPhase;
-  initialized = true;
-}
-
-export function getPhase(): PhaseId {
-  return current;
-}
-
-export function onManagerEvent(handler: (evt: PhaseManagerEvent) => void) {
-  const fn = (e: Event) => handler((e as CustomEvent<PhaseManagerEvent>).detail);
-  target.addEventListener("dudael:manager", fn);
-  return () => target.removeEventListener("dudael:manager", fn);
-}
-
-function emit(detail: PhaseManagerEvent) {
-  target.dispatchEvent(new CustomEvent("dudael:manager", { detail }));
-}
-
-function isLegal(from: PhaseId, to: PhaseId) {
+export function isLegalTransition(from: PhaseId, to: PhaseId): boolean {
   return (LEGAL[from] ?? []).includes(to);
 }
 
-// Side effects per transition, as you specified.
+/**
+ * Side effects per transition.
+ * NOTE: These are run-meta effects only (snapshotting, counters, locks).
+ * The *authoritative current phase* should live in the caller (Redux/store).
+ */
 function applySideEffects(from: PhaseId, to: PhaseId, packet?: PhasePacket) {
   // Identity locks at 02_select → 03_staging
   if (from === "02_select" && to === "03_staging") {
@@ -86,38 +68,52 @@ function applySideEffects(from: PhaseId, to: PhaseId, packet?: PhasePacket) {
   }
 }
 
-export function transition(to: PhaseId, packet?: PhasePacket) {
-  if (!initialized) {
-    emit({
-      type: "phase:illegal",
-      from: current,
-      to,
-      reason: "manager_not_initialized",
-      ts: Date.now(),
-    });
-    return { ok: false as const, reason: "manager_not_initialized" };
-  }
+/**
+ * Pure transition function:
+ * - validates legality
+ * - applies run-meta side effects (phase history, counters, identity lock)
+ * - returns next phase + updated meta snapshot
+ *
+ * Does NOT store "current" internally.
+ */
+export function transition(
+  from: PhaseId,
+  to: PhaseId,
+  packet?: PhasePacket
+): PhaseManagerResult {
+  const ts = Date.now();
 
-  const from = current;
-
-  if (!isLegal(from, to)) {
-    emit({
-      type: "phase:illegal",
+  if (!isLegalTransition(from, to)) {
+    return {
+      ok: false,
       from,
       to,
-      reason: `illegal_move:${from}->${to}`,
-      ts: Date.now(),
-    });
-    return { ok: false as const, reason: "illegal_move" };
+      reason: "illegal_move",
+      detail: `illegal_move:${from}->${to}`,
+      ts,
+    };
   }
 
-  emit({ type: "phase:transition", from, to, ts: Date.now() });
-
-  current = to;
+  // Record transition in meta history first (authoritative timeline)
   pushPhase(to);
+
+  // Apply run-meta side effects
   applySideEffects(from, to, packet);
 
-  emit({ type: "phase:enter", phase: to, from, ts: Date.now() });
+  // Return updated snapshot
+  return {
+    ok: true,
+    from,
+    to,
+    phase: to,
+    meta: getRunMeta(),
+    ts,
+  };
+}
 
-  return { ok: true as const, phase: to, meta: getRunMeta() };
+/**
+ * Optional: expose the legal map for UI/debug tooling.
+ */
+export function getLegalTransitions(): Readonly<Record<PhaseId, PhaseId[]>> {
+  return LEGAL;
 }

@@ -1,19 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
+import { Provider } from "react-redux";
+import { store } from "@/app/store";
 
-import { RootLayout } from "./RootLayout";
-import SelectShell from "./SelectShell";
-import TitleShell from "./TitleShell";
-import StagingShell from "./StagingShell";
-import { DraftLayout, DraftApproach, DraftOffering, DraftReckoning, DraftRouter } from "./DraftShell";
-import LevelShell from "./LevelShell";
-import DoorShell from "./DoorShell";
-import DropShell from "./DropShell";
+import { RootLayout } from "@/RootLayout";
+import SelectShell from "@/features/SelectShell";
+import TitleShell from "@/features/TitleShell";
+import StagingShell from "@/features/StagingShell";
+import { DraftLayout, DraftApproach, DraftOffering, DraftReckoning, DraftRouter } from "@/features/DraftShell";
+import LevelShell from "@/features/LevelShell";
+import DoorShell from "@/features/DoorShell";
+import DropShell from "@/features/DropShell";
 
-// side effects: boot + hotkeys + dev exchange
 import "../boot-walk";
-
 
 const router = createBrowserRouter([
     {
@@ -24,23 +24,26 @@ const router = createBrowserRouter([
             { path: "/select", element: <SelectShell /> },
             { path: "/staging", element: <StagingShell /> },
             {
-                path: "/draft", element: <DraftLayout />,
+                path: "/draft",
+                element: <DraftLayout />,
                 children: [
                     { index: true, element: <DraftRouter /> },
-                    { path: 'approach', element: <DraftApproach /> },
-                    { path: 'offering', element: <DraftOffering /> },
-                    { path: 'reckoning', element: <DraftReckoning /> },
-                ]
+                    { path: "approach", element: <DraftApproach /> },
+                    { path: "offering", element: <DraftOffering /> },
+                    { path: "reckoning", element: <DraftReckoning /> },
+                ],
             },
             { path: "/level", element: <LevelShell /> },
             { path: "/door", element: <DoorShell /> },
-            { path: "/drop", element: <DropShell /> }
-        ]
-    }
+            { path: "/drop", element: <DropShell /> },
+        ],
+    },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-        <RouterProvider router={router} />
+        <Provider store={store}>
+            <RouterProvider router={router} />
+        </Provider>
     </React.StrictMode>
 );
