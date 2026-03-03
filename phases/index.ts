@@ -5,7 +5,6 @@ export { boot, recoverRun, commitActivePacket, readActivePacket } from "./boot";
 export { transition } from "./manager";
 
 // TEMP compat for old call sites (delete later)
-export { transitionTo } from "./transitionTo";
 
 export {
   initRunMeta,

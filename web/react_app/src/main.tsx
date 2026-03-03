@@ -5,13 +5,13 @@ import { RouterProvider, createBrowserRouter } from "react-router";
 import { Provider } from "react-redux";
 import { store } from "@/app/store";
 import { RootLayout } from "@/RootLayout";
-import SelectShell from "@/features/SelectShell";
-import TitleShell from "@/features/TitleShell";
-import StagingShell from "@/features/StagingShell";
-import { DraftLayout, DraftApproach, DraftOffering, DraftReckoning, DraftRouter } from "@/features/DraftShell";
-import LevelShell from "@/features/LevelShell";
-import DoorShell from "@/features/DoorShell";
-import DropShell from "@/features/DropShell";
+import SelectShell from "@/phases/SelectShell";
+import TitleShell from "@/phases/TitleShell";
+import StagingShell from "@/phases/StagingShell";
+import { DraftLayout, DraftApproach, DraftOffering, DraftReckoning, DraftRouter } from "@/phases/DraftShell";
+import LevelShell from "@/phases/LevelShell";
+import DoorShell from "@/phases/DoorShell";
+import DropShell from "@/phases/DropShell";
 
 import "../boot-walk";
 

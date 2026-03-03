@@ -24,7 +24,7 @@
                 "../../data/*"
             ],
             "@features/*": [
-                "src/features/*"
+                "src/phases/*"
             ],
             "@components/*": [
                 "src/components/*"
@@ -37,7 +37,7 @@
     "include": [
         "src",
         "src/PhaseRouterBridge.ts",
-        "src/features/SelectShell/index.tsx",
+        "src/phases/*.ts",
         "../react_app/*.ts",
         "../react_app/*.tsx"
     ],

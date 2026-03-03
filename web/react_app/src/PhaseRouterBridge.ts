@@ -15,8 +15,6 @@ function isWithin(desired: string, current: string) {
   return current.startsWith(desired + "/");
 }
 
-
-
 export function PhaseRouterBridge() {
   const phase = useAppSelector(selectPhase);
   const navigate = useNavigate();

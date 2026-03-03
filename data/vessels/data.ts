@@ -7,17 +7,17 @@ export type VesselData = {
     code: string;
     subtitle: string;
     primaryHue: string;
-    lightBias: number;   // for flavor text and potential UI use
-    darkBias: number;    // for flavor text and potential UI use
-    resilience: number;  // for flavor text and potential UI use
-    stealth: number;     // for flavor text and potential UI use
-    biasText: string;    // for flavor text and potential UI use
-    theology: string;    // for flavor text and potential UI use
-    playstyle: string;   // for flavor text and potential UI use
-    tags: string[];      // for flavor text and potential UI use
-    assets: string[];    // for flavor text and potential UI use
-    mechanics?: VesselMechanics[]; // optional field for any specific mechanics or keywords associated with the vessel
-}; // placeholder for any additional data we want to track per vessel in the packet
+    lightBias: number; 
+    darkBias: number;  
+    resilience: number;
+    stealth: number;   
+    biasText: string;  
+    theology: string;  
+    playstyle: string; 
+    tags: string[];    
+    assets: string[];  
+    mechanics?: VesselMechanics[];
+}; 
 
 export type VesselDataRecordKey = 'seraph' | 'shadow' | 'exile' | 'penitent' | 'rebel';
 
