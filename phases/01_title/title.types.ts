@@ -6,7 +6,18 @@
  */
 
 // Re-export canonical core types for convenience
-export type { PhaseId, Alignment, PlayerIdentity, PhasePacket } from "../types";
+export type {
+  PhaseId,
+  Alignment,
+  PlayerIdentity,
+  PhasePacket,
+  Choice,
+  Selection,
+  GateSelection,
+  DescentGuide,
+  DescentMode,
+  VesselId as EngineVesselId,
+} from "../types";
 
 export type UserIdentity = {
   id: string;

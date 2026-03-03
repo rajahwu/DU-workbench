@@ -1,14 +1,15 @@
-import { useNavigate } from 'react-router';
-import { getRunMeta } from '@du/phases';
+import { useNavigate, useOutletContext } from 'react-router';
+import type { DraftShellContext } from './DraftShell.types';
 
 // DraftApproach — Stage 4A
 // The keepers emerge. Mood is set. No card action yet.
 // Player reads the room, sees their current parity and vessel,
 // then proceeds to the Offering.
+// Presentational — reads runMeta via Outlet context from DraftLayout (Shell).
 
 export default function DraftApproach() {
     const navigate = useNavigate();
-    const runMeta = getRunMeta();
+    const { runMeta } = useOutletContext<DraftShellContext>();
 
     const vessel = runMeta?.identity?.vessel ?? 'unknown';
     const light  = runMeta?.alignment?.light ?? 0;

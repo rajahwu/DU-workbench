@@ -52,7 +52,7 @@ function applySideEffects(from: PhaseId, to: PhaseId, packet?: PhasePacket) {
   if (from === "02_select" && to === "03_staging") {
     lockIdentity({
       userId: packet?.user?.id,
-      vessel: packet?.identity?.vessel ?? packet?.player?.vessel,
+      vessel: packet?.gate?.vesselId ?? packet?.identity?.vessel ?? packet?.player?.vessel,
       sigil: packet?.identity?.sigil ?? packet?.player?.sigil,
     });
   }

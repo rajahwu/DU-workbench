@@ -1,7 +1,7 @@
 // web/react_app/src/app/phaseSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { PhaseId, PhasePacket } from "@du/phases";
-import { transition as engineTransition } from "@du/phases";
+import { transition as engineTransition, buildPacket } from "@du/phases";
 import { restoreSnapshot, hydrateFromSnapshot, getRunMeta, type RunMetaSnapshot } from "@du/phases/meta";
 
 import type { AppDispatch, RootState } from "./store";
@@ -55,12 +55,7 @@ export function requestTransition(to: PhaseId, packet?: Partial<PhasePacket>) {
     const from = getState().phase.current;
 
     const fullPacket: PhasePacket | undefined = packet
-      ? ({
-        ...packet,
-        from,
-        to,
-        ts: Date.now(),
-      } as PhasePacket)
+      ? buildPacket(from, to, packet)
       : undefined;
 
     const result = engineTransition(from, to, fullPacket);

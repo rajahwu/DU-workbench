@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import { getRunMeta } from '@du/phases';
+import { useNavigate, useOutletContext } from 'react-router';
+import type { DraftShellContext } from './DraftShell.types';
 import { LIGHT_POOL, DARK_POOL, formatEffect } from '@data/cards/pool';
 import type { DraftCard } from '@data/cards/types';
 import { getDraftPoolCounts, type VesselId } from '@data/vessels/vessels';
 
-const shuffle = (arr: any[]) => [...arr].sort(() => 0.5 - Math.random());
+const shuffle = (arr: DraftCard[]) => [...arr].sort(() => 0.5 - Math.random());
 
 // ── Component ────────────────────────────────────────────────────────────────
+// Presentational — reads runMeta via Outlet context from DraftLayout (Shell).
 
 export default function DraftOffering() {
     const navigate  = useNavigate();
-    const runMeta   = getRunMeta();
+    const { runMeta } = useOutletContext<DraftShellContext>();
     const maxPicks  = 2;
 
     const vessel  = runMeta?.identity?.vessel?.toUpperCase() ?? '';

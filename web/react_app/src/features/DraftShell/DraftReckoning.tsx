@@ -1,8 +1,6 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router';
-import { transition, getRunMeta } from '@du/phases';
-import { useAppDispatch } from "@/app/hooks";
-import { requestTransition } from "@/app/phaseSlice";
+import { useNavigate, useLocation, useOutletContext } from 'react-router';
+import type { DraftShellContext } from './DraftShell.types';
 import { formatEffect } from '@data/cards/pool';
 import type { DraftCard } from '@data/cards/types';
 
@@ -10,12 +8,13 @@ import type { DraftCard } from '@data/cards/types';
 // The player sees what their picks did to parity.
 // Keeper commentary responds to the specific combination chosen.
 // Stakes are shown before they enter the Level.
-// On "Enter the Depth" — packet is written and phase transitions to 05_level.
+// On "Enter the Depth" — calls onEnterDepth from Shell context.
+// Presentational — reads runMeta + dispatch via Outlet context from DraftLayout (Shell).
 
 export default function DraftReckoning() {
     const navigate  = useNavigate();
     const location  = useLocation();
-    const runMeta   = getRunMeta();
+    const { runMeta, onEnterDepth } = useOutletContext<DraftShellContext>();
 
     // Cards arrive from Offering via router state
     const selectedCards: DraftCard[] = (location.state?.selectedCards ?? []) as DraftCard[];
@@ -81,24 +80,9 @@ export default function DraftReckoning() {
         return 'Parity balanced. Both paths remain open.';
     })();
 
-    const dispatch   = useAppDispatch();
     // ── Enter the Depth ──────────────────────────────────────────────────────
     const handleEnterDepth = () => {
-        const rawPacket = localStorage.getItem('dudael:active_packet');
-        const packet    = rawPacket ? JSON.parse(rawPacket) : { ts: Date.now() };
-
-        const updatedPacket = {
-            ...packet,
-            from: '04_draft',
-            to:   '05_level',
-            meta: {
-                ...packet.meta,
-                draftedCards:   selectedCards,
-                paritySnapshot: { light: newLight, dark: newDark },
-            },
-        };
-        
-        dispatch(requestTransition("05_level", updatedPacket));
+        onEnterDepth(selectedCards);
     };
     
     return (
