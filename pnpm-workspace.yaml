@@ -22,7 +22,7 @@ packages:
   # - "workbench/*"
   # - "services/*"
   # - "libs/*"
-  # - "components/*"
+  - "components/*"
   # - "hooks/*"
   # - "contexts/*"
   # - "providers/*"

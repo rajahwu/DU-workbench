@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { useAppSelector } from "./app/hooks";
-import { selectPhase } from "./app/phaseSlice";
+import { useAppSelector } from "@/app/hooks";
+import { selectPhase } from "../app/phaseSlice";
 import { phaseToPath } from "@du/phases/router";
+import "@/components/boot-walk";
 
 function normalize(pathname: string) {
   const clean = pathname.replace(/\/+$/, "") || "/";
@@ -15,7 +16,7 @@ function isWithin(desired: string, current: string) {
   return current.startsWith(desired + "/");
 }
 
-export function PhaseRouterBridge() {
+export default function PhaseRouterBridge() {
   const phase = useAppSelector(selectPhase);
   const navigate = useNavigate();
   const location = useLocation();

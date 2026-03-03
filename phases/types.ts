@@ -12,11 +12,11 @@ export type Alignment = { light: number; dark: number };
 
 export type PlayerIdentity = {
   id: string;
-  kind?: "player";                // player:...
+  // kind?: "player";                // player:...
   displayName?: string;
   vessel?: string;            // vessel:...
   sigil?: string;             // sigil:...
-  tags?: string[];            // e.g. ["early_supporter", "beta_tester", ...]
+  // tags?: string[];            // e.g. ["early_supporter", "beta_tester", ...]
 };
 
 // ── Generic picker (retained for Draft and future pool-based UIs) ──────────

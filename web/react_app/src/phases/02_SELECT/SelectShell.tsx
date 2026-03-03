@@ -6,6 +6,7 @@ import { type VesselDataRecordKey, VESSEL_DATA as vesselData } from "@data/vesse
 import type { GateSelection, DescentGuide, DescentMode, EngineVesselId } from "@du/phases";
 import { buildPacket } from "@du/phases";
 import SelectScreen from "./SelectScreen";
+import './style.css';
 
 export type GateStep = 0 | 1 | 2;
 

@@ -84,7 +84,7 @@ export function titleExchange(
   // Lite path — system defaults, guest player assigned
   const guestPlayer: PlayerIdentity = {
     id: `player:guest-${ts}`,
-    kind: "player",
+    // kind: "player",
     displayName: "Traveler",
   };
 

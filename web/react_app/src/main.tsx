@@ -1,28 +1,22 @@
-import React from "react";
+import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
 import { RouterProvider, createBrowserRouter } from "react-router";
 import { Provider } from "react-redux";
 import { store } from "@/app/store";
-import { RootLayout } from "@/RootLayout";
-import SelectShell from "@/phases/SelectShell";
-import TitleShell from "@/phases/TitleShell";
-import StagingShell from "@/phases/StagingShell";
-import { DraftLayout, DraftApproach, DraftOffering, DraftReckoning, DraftRouter } from "@/phases/DraftShell";
-import LevelShell from "@/phases/LevelShell";
-import DoorShell from "@/phases/DoorShell";
-import DropShell from "@/phases/DropShell";
+import RootLayout from "./components/RootLayout";
+import { DraftLayout, DraftApproach, DraftOffering, DraftReckoning, DraftRouter } from "@/phases/04_DRAFT";
+import { TitleStage, SelectStage, StagingStage, LevelStage, DoorStage, DropStage } from "@/phases";
 
-import "../boot-walk";
+import "./index.css";
 
 const router = createBrowserRouter([
     {
         element: <RootLayout />,
         children: [
-            { path: "/", element: <TitleShell /> },
-            { path: "/title", element: <TitleShell /> },
-            { path: "/select", element: <SelectShell /> },
-            { path: "/staging", element: <StagingShell /> },
+            { path: "/", element: <TitleStage /> },
+            { path: "/title", element: <TitleStage /> },
+            { path: "/select", element: <SelectStage /> },
+            { path: "/staging", element: <StagingStage /> },
             {
                 path: "/draft",
                 element: <DraftLayout />,
@@ -33,17 +27,17 @@ const router = createBrowserRouter([
                     { path: "reckoning", element: <DraftReckoning /> },
                 ],
             },
-            { path: "/level", element: <LevelShell /> },
-            { path: "/door", element: <DoorShell /> },
-            { path: "/drop", element: <DropShell /> },
+            { path: "/level", element: <LevelStage /> },
+            { path: "/door", element: <DoorStage /> },
+            { path: "/drop", element: <DropStage /> },
         ],
     },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-    <React.StrictMode>
+    <StrictMode>
         <Provider store={store}>
             <RouterProvider router={router} />
         </Provider>
-    </React.StrictMode>
+    </StrictMode>
 );
