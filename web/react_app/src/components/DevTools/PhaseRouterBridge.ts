@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { useAppSelector } from "@/app/hooks";
-import { selectPhase } from "../app/phaseSlice";
+import { selectPhase } from "../../app/phaseSlice";
 import { phaseToPath } from "@du/phases/router";
-import "@/components/boot-walk";
+import "@/util/dev/boot-walk";
 
 function normalize(pathname: string) {
   const clean = pathname.replace(/\/+$/, "") || "/";

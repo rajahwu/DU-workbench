@@ -2,7 +2,7 @@
 export { boot, recoverRun, commitActivePacket, readActivePacket } from "./boot";
 
 // new engine transition (pure)
-export { transition } from "./manager";
+export { transition, engineTransition } from "./manager";
 
 // TEMP compat for old call sites (delete later)
 
@@ -35,7 +35,6 @@ export type {
   VesselId as EngineVesselId,
   GateSelection,
 } from "./types";
-export { buildPacket } from "./types";
 
 // title entry + (optional) exchange helpers
 export { titleExchange, loadUserProfile, commitExchange } from "./01_title/title-exchange";

@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
 import { Provider } from "react-redux";
 import { store } from "@/app/store";
-import RootLayout from "./components/RootLayout";
+import RootLayout from "./components/Layouts/RootLayout";
 import { DraftLayout, DraftApproach, DraftOffering, DraftReckoning, DraftRouter } from "@/phases/04_DRAFT";
 import { TitleStage, SelectStage, StagingStage, LevelStage, DoorStage, DropStage } from "@/phases";
 

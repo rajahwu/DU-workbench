@@ -1,5 +1,5 @@
 // phases/manager.ts
-import type { PhaseId, PhasePacket } from "./types";
+import type { PhaseId, PhaseWallPacket } from "./types";
 import {
   getRunMeta,
   incDepth,
@@ -8,7 +8,6 @@ import {
   pushPhase,
 } from "./meta";
 
-export type { PhasePacket } from "./types";
 
 export type PhaseManagerResult =
   | {
@@ -33,28 +32,23 @@ const LEGAL: Record<PhaseId, PhaseId[]> = {
   "02_select": ["03_staging"],
   "03_staging": ["04_draft", "02_select"],
   "04_draft": ["05_level", "03_staging"],
-  "05_level": ["06_door"], // Summary -> door only
+  "05_level": ["06_door"],
   "06_door": ["04_draft", "03_staging", "07_drop"],
-  "07_drop": ["04_draft", "01_title", "03_staging"], // Summary -> staging allowed
+  "07_drop": ["04_draft", "01_title", "03_staging"],
 };
 
 export function isLegalTransition(from: PhaseId, to: PhaseId): boolean {
   return (LEGAL[from] ?? []).includes(to);
 }
 
-/**
- * Side effects per transition.
- * NOTE: These are run-meta effects only (snapshotting, counters, locks).
- * The *authoritative current phase* should live in the caller (Redux/store).
- */
-function applySideEffects(from: PhaseId, to: PhaseId, packet?: PhasePacket) {
-  // Identity locks at 02_select → 03_staging
+
+function applySideEffects(from: PhaseId, to: PhaseId, wall?: PhaseWallPacket) {
+  // Identity lock: read from run/meta or from wall.payload if you still want
   if (from === "02_select" && to === "03_staging") {
-    lockIdentity({
-      userId: packet?.user?.id,
-      vessel: packet?.gate?.vesselId ?? packet?.identity?.vessel ?? packet?.player?.vessel,
-      sigil: packet?.identity?.sigil ?? packet?.player?.sigil,
-    });
+    const payload = wall?.payload;
+    if (payload && payload.kind === "select->staging") {
+      lockIdentity();
+    }
   }
 
   // Depth increments on entry to 05_level
@@ -68,18 +62,10 @@ function applySideEffects(from: PhaseId, to: PhaseId, packet?: PhasePacket) {
   }
 }
 
-/**
- * Pure transition function:
- * - validates legality
- * - applies run-meta side effects (phase history, counters, identity lock)
- * - returns next phase + updated meta snapshot
- *
- * Does NOT store "current" internally.
- */
 export function transition(
   from: PhaseId,
   to: PhaseId,
-  packet?: PhasePacket
+  wall?: PhaseWallPacket,
 ): PhaseManagerResult {
   const ts = Date.now();
 
@@ -94,13 +80,9 @@ export function transition(
     };
   }
 
-  // Record transition in meta history first (authoritative timeline)
   pushPhase(to);
+  applySideEffects(from, to, wall);
 
-  // Apply run-meta side effects
-  applySideEffects(from, to, packet);
-
-  // Return updated snapshot
   return {
     ok: true,
     from,
@@ -111,9 +93,16 @@ export function transition(
   };
 }
 
-/**
- * Optional: expose the legal map for UI/debug tooling.
- */
-export function getLegalTransitions(): Readonly<Record<PhaseId, PhaseId[]>> {
-  return LEGAL;
+export function getRunLedger() {
+  // read from your central run ledger store or from the active packet
+  return null;
 }
+
+export function engineTransition(
+  from: PhaseId,
+  to: PhaseId,
+  wall?: PhaseWallPacket,
+): PhaseManagerResult {
+  // This is where you would branch on wall.payload.kind for more complex logic
+  return transition(from, to, wall);
+} 

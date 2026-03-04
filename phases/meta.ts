@@ -1,26 +1,95 @@
 // phases/meta.ts
 import type { PhaseId, Alignment } from "./types";
+import { getRunLedger } from "./manager";
+import type { VesselId, DescentGuide, DescentMode } from "./types";
+
 export type { PhaseId, Alignment } from "./types";
 
 export type Parity = "light" | "dark" | "neutral";
-
+// phases/meta.ts (engine-side snapshot)
 export type RunMetaSnapshot = {
-  sessionId: string;
-  depth: number;
-  loopCount: number;
-  alignment: Alignment;
-  insight: number;
-  parity: Parity;
-  inventory: string[];
-  phaseHistory: PhaseId[];
-  identityLocked: boolean;
-  identity?: {
+  runId: string;
+
+  runner: {
     userId?: string;
-    vessel?: string;
-    sigil?: string;
+    vesselId?: VesselId;
+    sigilKey?: string;
   };
-  updatedAt: number;
+
+  gateLock?: {
+    guide: DescentGuide;
+    mode: DescentMode;
+    vesselId: VesselId;
+    lockedAt: PhaseId;
+  };
+
+  progress: {
+    depth: number;
+    loopCount: number;
+  };
+
+  alignment: {
+    current: Alignment;
+  };
+
+  inventory: {
+    memoryFragments: number;
+    relicIds: string[];
+    draftCardIds: string[];
+  };
+
+  history: {
+    phaseTrail: PhaseId[];
+    lastDoorChoice?: "light" | "dark" | "secret";
+    lastDropReason?: "death" | "math_fail" | "exit";
+  };
+
+  metaFlags: {
+    penitentInsight: number;
+    rebelBreaches: number;
+    unlockedCodexKeys: string[];
+  };
 };
+
+let _meta: RunMetaSnapshot = {
+  runId: "",
+  runner: {},
+  gateLock: undefined,
+  progress: { depth: 0, loopCount: 0 },
+  alignment: { current: { light: 0, dark: 0 } },
+  inventory: { memoryFragments: 0, relicIds: [], draftCardIds: [] },
+  history: { phaseTrail: [] },
+  metaFlags: {
+    penitentInsight: 0,
+    rebelBreaches: 0,
+    unlockedCodexKeys: [],
+  },
+};
+
+export function getRunMeta(): RunMetaSnapshot {
+  return _meta;
+}
+
+export function setRunId(runId: string) {
+  _meta.runId = runId;
+}
+
+export function lockIdentity() {
+  if (!_meta.runner.userId && !_meta.runner.vesselId) return;
+  // persist to whatever long-term store you like (or leave as is)
+}
+
+export function incDepth() {
+  _meta.progress.depth += 1;
+}
+
+export function incLoop() {
+  _meta.progress.loopCount += 1;
+}
+
+export function pushPhase(phase: PhaseId) {
+  _meta.history.phaseTrail.push(phase);
+}
 
 const STORAGE_KEY = "dudael:run_meta";
 
@@ -109,14 +178,17 @@ export function addToInventory(itemId: string): { added: boolean; reason?: strin
   return { added: true };
 }
 
-export function lockIdentity(identity: NonNullable<RunMetaSnapshot["identity"]>) {
-  if (state.identityLocked) return;
-  state.identityLocked = true;
-  state.identity = { ...(state.identity ?? {}), ...identity };
-  state.updatedAt = now();
-  snapshot();
-}
+export function lockIdentity() {
+  const run = getRunLedger();
+  if (!run) return;
 
+  const userId = run.runner.userId;
+  const vessel = run.runner.vesselId;
+  const sigil = run.runner.sigilKey;
+
+  // persist this into the meta snapshot however you currently do it
+  _lockIdentityInternal({ userId, vessel, sigil });
+}
 export function snapshot() {
   try {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));

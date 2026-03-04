@@ -1,80 +1,50 @@
-import { useState } from "react";
-import { useAppDispatch } from "@/app/hooks";
+// phases/02_select/select-shell.tsx
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { selectRun, lockGate } from "@app/runSlice";
 import { requestTransition } from "@/app/phaseSlice";
-import { type VesselId, buildVesselPacketStats } from "@data/vessels/vessels";
-import { type VesselDataRecordKey, VESSEL_DATA as vesselData } from "@data/vessels/data";
-import type { GateSelection, DescentGuide, DescentMode, EngineVesselId } from "@du/phases";
-import { buildPacket } from "@du/phases";
-import SelectScreen from "./SelectScreen";
-import './style.css';
+import {
+    buildWallPacket,
+    PhaseWallPacket,
+    SelectToStagingWall,
+    GateChoice,
+    VesselId,
+} from "@du/phases/types";
 
-export type GateStep = 0 | 1 | 2;
-
-/**
- * SelectShell — data + dispatch layer.
- * Owns: Gate step state, vessel locking, packet building, transition.
- * Renders: SelectScreen (presentational).
- */
-export default function SelectShell() {
-    const [step, setStep] = useState<GateStep>(0);
-    const [gate, setGate] = useState<GateSelection>({});
-    const [activeVesselId, setActiveVesselId] = useState<VesselDataRecordKey>("seraph");
+export function useSelectHandlers() {
     const dispatch = useAppDispatch();
+    const run = useAppSelector(selectRun);
 
-    const handleGuide = (guide: DescentGuide) => {
-        setGate((prev) => ({ ...prev, guide }));
-        setStep(1);
-    };
-
-    const handleMode = (mode: DescentMode) => {
-        setGate((prev) => ({ ...prev, mode }));
-        setStep(2);
-    };
-
-    const handleLockVessel = () => {
-        const engineId = activeVesselId.toUpperCase() as VesselId;
-        const vesselKey = activeVesselId as EngineVesselId;
-        const activeData = vesselData[activeVesselId];
-        console.log(`Locking in vessel: ${activeData.name}`);
-
-        const rawPacket = localStorage.getItem("dudael:active_packet");
-        const prev = rawPacket
-            ? JSON.parse(rawPacket)
-            : { ts: Date.now(), user: { id: "guest", kind: "user" } };
-
-        const stats = buildVesselPacketStats(engineId);
-        const finalGate: GateSelection = { ...gate, vesselId: vesselKey };
-
-        const updatedPacket = buildPacket("02_select", "03_staging", {
-            ...prev,
-            gate: finalGate,
-            player: { ...(prev.player || {}), vessel: engineId, stats },
-        });
-
-        dispatch(requestTransition("03_staging", updatedPacket));
-    };
-
-    const handleBack = () => {
-        if (step === 1) {
-            setGate((prev) => ({ ...prev, guide: undefined }));
-            setStep(0);
+    function handleLockGate(choice: Required<GateChoice>) {
+        if (!run) {
+            console.warn("No run initialized before Gate lock");
+            return;
         }
-        if (step === 2) {
-            setGate((prev) => ({ ...prev, mode: undefined }));
-            setStep(1);
-        }
-    };
 
-    return (
-        <SelectScreen
-            step={step}
-            gate={gate}
-            activeVesselId={activeVesselId}
-            onGuide={handleGuide}
-            onMode={handleMode}
-            onLockVessel={handleLockVessel}
-            onBack={handleBack}
-            onSelectVessel={setActiveVesselId}
-        />
-    );
+        // 1) Update persistent run state
+        dispatch(
+            lockGate({
+                choice,
+                lockedAt: "03_staging",
+            }),
+        );
+
+        // 2) Build minimal wall packet to Staging
+        const payload: SelectToStagingWall = {
+            kind: "select->staging",
+            runId: run.runId,
+            runnerRef: { runnerId: run.runner.runnerId },
+            gateChoice: choice,
+            // alignmentSnapshot optional: only if Staging needs immediate parity
+        };
+
+        const wall: PhaseWallPacket = buildWallPacket(
+            "02_select",
+            "03_staging",
+            payload,
+        );
+
+        dispatch(requestTransition(wall));
+    }
+
+    return { handleLockGate };
 }
