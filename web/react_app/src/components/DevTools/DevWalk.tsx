@@ -1,8 +1,10 @@
 import { useEffect } from "react";
 import { useAppDispatch } from "@/app/hooks";
-import { requestTransition } from "@/app/phaseSlice";
+import { requestTransition } from "@/app/requestTransition";
+import { setPhaseAndWall } from "@/app/phaseSlice";
 import type { PhaseId } from "@du/phases";
 import type { PhasePacket } from "@du/phases";
+import { normalizeLegacyPacket } from "@du/phases/types";
 
 export function BootPacketBridge() {
   const dispatch = useAppDispatch();
@@ -10,8 +12,8 @@ export function BootPacketBridge() {
   useEffect(() => {
     const onBootPacket = (e: Event) => {
       const packet = (e as CustomEvent<PhasePacket>).detail;
-      // This uses legality rules in the engine (via requestTransition thunk)
-      dispatch(requestTransition(packet.to, packet));
+      const { wall } = normalizeLegacyPacket(packet);
+      dispatch(requestTransition(wall));
     };
 
     window.addEventListener("dudael:boot_packet", onBootPacket);
@@ -44,9 +46,7 @@ export function DevWalk() {
 
       e.preventDefault();
 
-      // ⚠️ This will fail if illegal from current phase.
-      // If you want "force jump" for dev, I’ll show that below.
-      dispatch(requestTransition(to));
+      dispatch(setPhaseAndWall({ phase: to, wall: null }));
     }
 
     window.addEventListener("keydown", onKeyDown);

@@ -15,8 +15,8 @@ export default function DraftOffering() {
     const { runMeta } = useOutletContext<DraftShellContext>();
     const maxPicks  = 2;
 
-    const vessel  = runMeta?.identity?.vessel?.toUpperCase() ?? '';
-    const insight = runMeta?.insight ?? 0;
+    const vessel  = runMeta.runner.vesselId?.toUpperCase() ?? '';
+    const insight = runMeta.metaFlags.penitentInsight;
 
     const [offerings, setOfferings] = useState<{ light: DraftCard[]; dark: DraftCard[] }>({ light: [], dark: [] });
     const [picked, setPicked]       = useState<DraftCard[]>([]);
@@ -27,7 +27,7 @@ export default function DraftOffering() {
     const dealCards = () => {
         const vesselId = (vessel || 'EXILE') as VesselId;
         const { lightCards, darkCards } = getDraftPoolCounts(
-            vesselId, runMeta?.alignment?.light ?? 0, runMeta?.alignment?.dark ?? 0
+            vesselId, runMeta.alignment.current.light, runMeta.alignment.current.dark
         );
         setOfferings({
             light: shuffle(LIGHT_POOL).slice(0, lightCards),

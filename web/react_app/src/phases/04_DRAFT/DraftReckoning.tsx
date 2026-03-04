@@ -19,9 +19,9 @@ export default function DraftReckoning() {
     // Cards arrive from Offering via router state
     const selectedCards: DraftCard[] = (location.state?.selectedCards ?? []) as DraftCard[];
 
-    const light  = runMeta?.alignment?.light ?? 0;
-    const dark   = runMeta?.alignment?.dark  ?? 0;
-    const vessel = runMeta?.identity?.vessel?.toUpperCase() ?? '';
+    const light  = runMeta.alignment.current.light;
+    const dark   = runMeta.alignment.current.dark;
+    const vessel = runMeta.runner.vesselId?.toUpperCase() ?? '';
 
     // Compute parity deltas from selected cards
     const lightDelta = selectedCards.reduce((sum, c) => sum + (c.mechanics?.lightDelta ?? 0), 0);

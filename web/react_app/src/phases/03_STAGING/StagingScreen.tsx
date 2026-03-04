@@ -55,19 +55,19 @@ export default function StagingScreen({ activePhaseId, onSelectPhase, onInitiate
             <div className="live-stats-bar">
                 <div className="stat-block">
                     <span className="stat-label">Vessel Lock</span>
-                    <span className="stat-value" style={{ color: "#D4A843" }}>{runMeta.identity?.vessel?.toUpperCase() || "UNKNOWN"}</span>
+                    <span className="stat-value" style={{ color: "#D4A843" }}>{runMeta.runner.vesselId?.toUpperCase() || "UNKNOWN"}</span>
                 </div>
                 <div className="stat-block">
                     <span className="stat-label">Current Depth</span>
-                    <span className="stat-value" style={{ color: "#6B8F71" }}>Lvl {runMeta.depth}</span>
+                    <span className="stat-value" style={{ color: "#6B8F71" }}>Lvl {runMeta.progress.depth}</span>
                 </div>
                 <div className="stat-block">
                     <span className="stat-label">Loop Count</span>
-                    <span className="stat-value" style={{ color: "#7B4FA2" }}>{runMeta.loopCount}</span>
+                    <span className="stat-value" style={{ color: "#7B4FA2" }}>{runMeta.progress.loopCount}</span>
                 </div>
                 <div className="stat-block">
                     <span className="stat-label">Parity Alignment</span>
-                    <span className="stat-value" style={{ color: "#8BA0B5" }}>{runMeta.parity.toUpperCase()}</span>
+                    <span className="stat-value" style={{ color: "#8BA0B5" }}>{runMeta.alignment.current.light === runMeta.alignment.current.dark ? "NEUTRAL" : runMeta.alignment.current.light > runMeta.alignment.current.dark ? "LIGHT" : "DARK"}</span>
                 </div>
             </div>
 

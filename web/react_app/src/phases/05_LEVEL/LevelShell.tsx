@@ -1,7 +1,9 @@
-import { getRunMeta, buildPacket } from "@du/phases";
+import { getRunMeta } from "@du/phases";
+import { buildWallPacket, type LevelToDoorWall } from "@du/phases/types";
 import { VESSELS, getLevelCombatDeltas, type VesselId } from "@data/vessels/vessels";
-import { useAppDispatch } from "@/app/hooks";
-import { requestTransition } from "@/app/phaseSlice";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { requestTransition } from "@/app/requestTransition";
+import { selectRun, updateAlignment } from "@/app/runSlice";
 import LevelScreen from "./LevelScreen";
 
 /**
@@ -12,25 +14,27 @@ import LevelScreen from "./LevelScreen";
 export default function LevelShell() {
     const runMeta = getRunMeta();
     const dispatch = useAppDispatch();
+    const run = useAppSelector(selectRun);
 
-    const depth = runMeta.depth || 1;
-    const vessel = runMeta?.identity?.vessel?.toUpperCase() ?? "";
+    const depth = runMeta.progress.depth || 1;
+    const vessel = runMeta.runner.vesselId?.toUpperCase() ?? "";
     const vesselId = (vessel || "EXILE") as VesselId;
     const combatDeltas = getLevelCombatDeltas(vesselId);
     const maxHealth = VESSELS[vesselId].maxHealth;
 
     const handleLevelComplete = (survived: boolean, points: number) => {
-        const rawPacket = localStorage.getItem("dudael:active_packet");
-        const packet = rawPacket ? JSON.parse(rawPacket) : { ts: Date.now() };
+        const nextLight = survived ? 1 : 0;
+        const nextDark = survived ? 0 : 1;
 
-        const updatedPacket = buildPacket("05_level", "06_door", {
-            ...packet,
-            meta: {
-                ...packet.meta,
-                levelResult: { survived, points },
-            },
-        });
-        dispatch(requestTransition("06_door", updatedPacket));
+        dispatch(updateAlignment({ delta: { light: nextLight, dark: nextDark } }));
+
+        const payload: LevelToDoorWall = {
+            kind: "level->door",
+            runId: run?.runId ?? runMeta.runId,
+        };
+        const wall = buildWallPacket("05_level", "06_door", payload);
+
+        dispatch(requestTransition(wall));
     };
 
     return (
@@ -39,8 +43,8 @@ export default function LevelShell() {
             maxDepth={5}
             combatDeltas={combatDeltas}
             maxHealth={maxHealth}
-            initialLight={runMeta.alignment.light}
-            initialDark={runMeta.alignment.dark}
+            initialLight={runMeta.alignment.current.light}
+            initialDark={runMeta.alignment.current.dark}
             onLevelComplete={handleLevelComplete}
         />
     );

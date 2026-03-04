@@ -1,8 +1,10 @@
-import { getRunMeta, buildPacket } from "@du/phases";
+import { getRunMeta } from "@du/phases";
 import { getDoorCosts, getSecretDoorThreshold, type VesselId } from "@data/vessels/vessels";
 import type { PhaseId } from "@du/phases/types";
-import { useAppDispatch } from "@/app/hooks";
-import { requestTransition } from "@/app/phaseSlice";
+import { buildWallPacket, type DoorToDropWall, type DoorToDraftWall } from "@du/phases/types";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { requestTransition } from "@/app/requestTransition";
+import { selectRun } from "@/app/runSlice";
 import DoorScreen from "./DoorScreen";
 
 /**
@@ -13,14 +15,14 @@ import DoorScreen from "./DoorScreen";
 export default function DoorShell() {
     const runMeta = getRunMeta();
     const dispatch = useAppDispatch();
+    const run = useAppSelector(selectRun);
 
-    const light = runMeta.alignment.light;
-    const dark = runMeta.alignment.dark;
-    const depth = runMeta.depth;
+    const light = runMeta.alignment.current.light;
+    const dark = runMeta.alignment.current.dark;
+    const depth = runMeta.progress.depth;
     const maxDepth = 5;
 
-    const packetRaw = localStorage.getItem("dudael:active_packet");
-    const vesselId = (packetRaw ? JSON.parse(packetRaw)?.player?.vessel : "EXILE") as VesselId;
+    const vesselId = (runMeta.runner.vesselId ?? "EXILE") as VesselId;
     const { lightCost, darkCost } = getDoorCosts(vesselId, depth);
     const secretThreshold = getSecretDoorThreshold(vesselId);
 
@@ -32,30 +34,32 @@ export default function DoorShell() {
     const handleChooseDoor = (path: "light" | "dark" | "secret") => {
         console.log(`🚪 Opening ${path.toUpperCase()} door. Continuing loop...`);
 
-        const rawPacket = localStorage.getItem("dudael:active_packet");
-        const packet = rawPacket ? JSON.parse(rawPacket) : { ts: Date.now() };
-
         const targetPhase = (isMaxDepth ? "07_drop" : "04_draft") as PhaseId;
 
-        const updatedPacket = buildPacket("06_door", targetPhase, {
-            ...packet,
-            meta: { ...packet.meta, doorChosen: path },
-        });
+        const wall = targetPhase === "07_drop"
+            ? buildWallPacket("06_door", "07_drop", {
+                kind: "door->drop",
+                runId: run?.runId ?? runMeta.runId,
+                doorChoice: path,
+            } satisfies DoorToDropWall)
+            : buildWallPacket("06_door", "04_draft", {
+                kind: "door->draft",
+                runId: run?.runId ?? runMeta.runId,
+                doorChoice: path,
+            } satisfies DoorToDraftWall);
 
-        dispatch(requestTransition(targetPhase, updatedPacket));
+        dispatch(requestTransition(wall));
     };
 
     const handleForcedDrop = () => {
         console.log("☠️ No doors available. Forced Drop.");
-        const rawPacket = localStorage.getItem("dudael:active_packet");
-        const packet = rawPacket ? JSON.parse(rawPacket) : { ts: Date.now() };
+        const wall = buildWallPacket("06_door", "07_drop", {
+            kind: "door->drop",
+            runId: run?.runId ?? runMeta.runId,
+            doorChoice: "dark",
+        } satisfies DoorToDropWall);
 
-        const updatedPacket = buildPacket("06_door", "07_drop", {
-            ...packet,
-            meta: { ...packet.meta, forcedDrop: true },
-        });
-
-        dispatch(requestTransition("07_drop", updatedPacket));
+        dispatch(requestTransition(wall));
     };
 
     return (

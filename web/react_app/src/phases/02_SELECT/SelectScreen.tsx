@@ -1,6 +1,7 @@
 import { VESSEL_DATA as vesselData, type VesselDataRecordKey } from "@data/vessels/data";
 import type { GateSelection, DescentGuide, DescentMode } from "@du/phases";
 import type { GateStep } from "./SelectShell";
+import "./style.css";
 
 const svgTemplates: Record<VesselDataRecordKey, string> = {
     seraph: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><radialGradient id="sg" cx="50%" cy="50%" r="35%"><stop offset="0%" stop-color="#D4A843" stop-opacity="0.3"/><stop offset="100%" stop-color="#D4A843" stop-opacity="0"/></radialGradient><filter id="gl"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><rect width="400" height="400" fill="transparent"/><line x1="200" y1="0" x2="200" y2="400" stroke="#1A1C24" stroke-width=".5"/><line x1="0" y1="200" x2="400" y2="200" stroke="#1A1C24" stroke-width=".5"/><circle cx="200" cy="200" r="150" fill="url(#sg)"/><circle cx="200" cy="200" r="140" fill="none" stroke="#2A2D38" stroke-width=".5"/><circle cx="200" cy="200" r="120" fill="none" stroke="#D4A843" stroke-width=".3" opacity=".3"/><circle cx="200" cy="200" r="100" fill="none" stroke="#D4A843" stroke-width=".8" opacity=".7"/><circle cx="200" cy="200" r="60" fill="none" stroke="#D4A843" stroke-width=".4" opacity=".5"/><g stroke="#D4A843" stroke-width=".6" opacity=".6" filter="url(#gl)"><line x1="200" y1="200" x2="200" y2="80"/><line x1="200" y1="200" x2="303.9" y2="140"/><line x1="200" y1="200" x2="303.9" y2="260"/><line x1="200" y1="200" x2="200" y2="320"/><line x1="200" y1="200" x2="96.1" y2="260"/><line x1="200" y1="200" x2="96.1" y2="140"/></g><polygon points="200,105 282,152.5 282,247.5 200,295 118,247.5 118,152.5" fill="none" stroke="#D4A843" stroke-width=".5" opacity=".4"/><g transform="translate(200,200)" filter="url(#gl)"><ellipse cx="0" cy="-15" rx="8" ry="30" fill="none" stroke="#D4A843" stroke-width="1" opacity=".8"/><ellipse cx="0" cy="-15" rx="8" ry="30" fill="none" stroke="#D4A843" stroke-width="1" opacity=".6" transform="rotate(60)"/><ellipse cx="0" cy="-15" rx="8" ry="30" fill="none" stroke="#D4A843" stroke-width="1" opacity=".6" transform="rotate(120)"/><ellipse cx="0" cy="-15" rx="8" ry="30" fill="none" stroke="#D4A843" stroke-width="1" opacity=".8" transform="rotate(180)"/><ellipse cx="0" cy="-15" rx="8" ry="30" fill="none" stroke="#D4A843" stroke-width="1" opacity=".6" transform="rotate(240)"/><ellipse cx="0" cy="-15" rx="8" ry="30" fill="none" stroke="#D4A843" stroke-width="1" opacity=".6" transform="rotate(300)"/><circle cx="0" cy="0" r="8" fill="#D4A843" fill-opacity=".15" stroke="#D4A843" stroke-width="1"/><circle cx="0" cy="0" r="3" fill="#D4A843" fill-opacity=".9"/></g></svg>`,
@@ -12,7 +13,7 @@ const svgTemplates: Record<VesselDataRecordKey, string> = {
 
 type SelectScreenProps = {
     step: GateStep;
-    gate: GateSelection;
+    gate: Partial<GateSelection>;
     activeVesselId: VesselDataRecordKey;
     onGuide: (guide: DescentGuide) => void;
     onMode: (mode: DescentMode) => void;

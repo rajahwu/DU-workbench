@@ -46,6 +46,7 @@ export type GamePhaseId =
   | "07_drop";
 
 export type PlayerIdentity = {
+  id?: string;
   userId?: string;
   vessel?: string;
   sigil?: string;
@@ -78,6 +79,8 @@ export type PhaseWallPayload =
   | StagingToDraftWall
   | DraftToLevelWall
   | LevelToDoorWall
+  | DoorToDraftWall
+  | DoorToStagingWall
   | DoorToDropWall
   | DropToStagingWall;
 
@@ -114,6 +117,18 @@ export type LevelToDoorWall = {
 
 export type DoorToDropWall = {
   kind: "door->drop";
+  runId: string;
+  doorChoice?: "light" | "dark" | "secret";
+};
+
+export type DoorToDraftWall = {
+  kind: "door->draft";
+  runId: string;
+  doorChoice?: "light" | "dark" | "secret";
+};
+
+export type DoorToStagingWall = {
+  kind: "door->staging";
   runId: string;
   doorChoice?: "light" | "dark" | "secret";
 };

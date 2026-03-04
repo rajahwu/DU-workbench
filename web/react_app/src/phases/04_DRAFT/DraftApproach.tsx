@@ -11,9 +11,9 @@ export default function DraftApproach() {
     const navigate = useNavigate();
     const { runMeta } = useOutletContext<DraftShellContext>();
 
-    const vessel = runMeta?.identity?.vessel ?? 'unknown';
-    const light  = runMeta?.alignment?.light ?? 0;
-    const dark   = runMeta?.alignment?.dark  ?? 0;
+    const vessel = runMeta.runner.vesselId ?? 'unknown';
+    const light  = runMeta.alignment.current.light;
+    const dark   = runMeta.alignment.current.dark;
 
     // Keeper tone shifts based on parity state —
     // the attentive player learns to read this over runs.
@@ -26,8 +26,8 @@ export default function DraftApproach() {
     // Vessel-specific Approach note
     const vesselNote = (() => {
         switch (vessel?.toUpperCase()) {
-            case 'PENITENT': return runMeta?.insight && runMeta?.insight > 0
-                ? `Insight: ${runMeta?.insight ? runMeta.insight : 0} — your study has sharpened your sight.`
+            case 'PENITENT': return runMeta.metaFlags.penitentInsight > 0
+                ? `Insight: ${runMeta.metaFlags.penitentInsight} — your study has sharpened your sight.`
                 : 'Reading in the Locker Room sharpens what you see here.';
             case 'REBEL': return dark - light >= 3
                 ? 'Instability active. Dark doors will be cheaper. Mistakes will cost more.'

@@ -66,7 +66,7 @@ export function recoverRun(): { ok: boolean; phase?: PhaseId; reason?: string } 
   hydrateFromSnapshot(snap);
 
   const last =
-    (snap.phaseHistory?.[snap.phaseHistory.length - 1] as PhaseId | undefined) ??
+    (snap.history.phaseTrail[snap.history.phaseTrail.length - 1] as PhaseId | undefined) ??
     "01_title";
 
   return { ok: true, phase: last };
@@ -108,7 +108,7 @@ export function boot() {
     // init run meta (authoritative timeline for the run)
     const sid = sessionIdFromPacket(detail);
     initRunMeta(sid, {
-      phaseHistory: [detail.from],
+      history: { phaseTrail: [detail.from] },
       // seed alignment/depth/inventory here if packet includes them later
     });
 

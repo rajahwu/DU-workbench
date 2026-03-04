@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { getRunMeta, buildPacket } from "@du/phases";
-import { useAppDispatch } from "@/app/hooks";
-import { requestTransition } from "@/app/phaseSlice";
+import { getRunMeta } from "@du/phases";
+import { buildWallPacket, type PhaseWallPacket, type StagingToDraftWall } from "@du/phases/types";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { requestTransition } from "@/app/requestTransition";
+import { selectRun } from "@/app/runSlice";
 import StagingScreen from "./StagingScreen";
 
 /**
@@ -12,18 +14,18 @@ import StagingScreen from "./StagingScreen";
 export default function StagingShell() {
     const [activePhaseId, setActivePhaseId] = useState<string>("staging");
     const dispatch = useAppDispatch();
+    const run = useAppSelector(selectRun);
     const runMeta = getRunMeta();
 
     const handleInitiateDraft = () => {
         console.log("⏬ Commencing Draft sequence...");
-        const rawPacket = localStorage.getItem("dudael:active_packet");
-        const packet = rawPacket ? JSON.parse(rawPacket) : { ts: Date.now() };
+        const payload: StagingToDraftWall = {
+            kind: "staging->draft",
+            runId: run?.runId ?? runMeta.runId,
+        };
+        const wall: PhaseWallPacket = buildWallPacket("03_staging", "04_draft", payload);
 
-        const updatedPacket = buildPacket("03_staging", "04_draft", {
-            ...packet,
-        });
-
-        dispatch(requestTransition("04_draft", updatedPacket));
+        dispatch(requestTransition(wall));
     };
 
     return (

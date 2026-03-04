@@ -46,22 +46,22 @@ export default function DropScreen({
                     <div className="drop-stat">
                         <span className="drop-stat-label">Vessel</span>
                         <span className="drop-stat-value" style={{ color: "#D4A843" }}>
-                            {runMeta.identity?.vessel?.toUpperCase() || "UNKNOWN"}
+                            {runMeta.runner.vesselId?.toUpperCase() || "UNKNOWN"}
                         </span>
                     </div>
                     <div className="drop-stat">
                         <span className="drop-stat-label">Depth Reached</span>
-                        <span className="drop-stat-value">{runMeta.depth} / 5</span>
+                        <span className="drop-stat-value">{runMeta.progress.depth} / 5</span>
                     </div>
                     <div className="drop-stat">
                         <span className="drop-stat-label">Points</span>
-                        <span className="drop-stat-value">{levelResult.points || runMeta.depth}</span>
+                        <span className="drop-stat-value">{levelResult.points || runMeta.progress.depth}</span>
                     </div>
                     <div className="drop-stat">
                         <span className="drop-stat-label">Final Parity</span>
                         <span className="drop-stat-value">
-                            <span style={{ color: "#D4A843" }}>{runMeta.alignment.light}L</span> /{" "}
-                            <span style={{ color: "#7B4FA2" }}>{runMeta.alignment.dark}D</span>
+                            <span style={{ color: "#D4A843" }}>{runMeta.alignment.current.light}L</span> /{" "}
+                            <span style={{ color: "#7B4FA2" }}>{runMeta.alignment.current.dark}D</span>
                         </span>
                     </div>
                     <div className="drop-stat">
@@ -72,13 +72,13 @@ export default function DropScreen({
                     </div>
                     <div className="drop-stat">
                         <span className="drop-stat-label">Total Loops</span>
-                        <span className="drop-stat-value">{runMeta.loopCount}</span>
+                        <span className="drop-stat-value">{runMeta.progress.loopCount}</span>
                     </div>
                 </div>
 
                 <div className="section-label">Archive Extraction</div>
                 <div>
-                    {runMeta.depth >= 3 && <span className="unlock-badge">+1 Currency</span>}
+                    {runMeta.progress.depth >= 3 && <span className="unlock-badge">+1 Currency</span>}
                     {!survived && (
                         <span className="unlock-badge" style={{ borderColor: "#C04050", color: "#C04050" }}>
                             Scar: Fractured
@@ -94,7 +94,7 @@ export default function DropScreen({
                             +1 {vesselConfig.mechanics.metaCounter.charAt(0).toUpperCase() + vesselConfig.mechanics.metaCounter.slice(1)}
                         </span>
                     )}
-                    {runMeta.depth < 3 && survived && (
+                    {runMeta.progress.depth < 3 && survived && (
                         <span style={{ fontSize: "9px", color: "#4A4D58" }}>No new anomalies detected.</span>
                     )}
                 </div>

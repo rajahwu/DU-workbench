@@ -1,8 +1,6 @@
 // web/react_app/src/app/phaseSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import type {PhaseId, PhaseWallPayload, PhaseWallPacket } from "@du/phases/types";
-import { buildWallPacket } from "@du/phases/types";
-import { engineTransition } from "@du/phases/manager";
+import type { PhaseId, PhaseWallPacket } from "@du/phases/types";
 
 import {
   restoreSnapshot,
@@ -11,7 +9,7 @@ import {
   type RunMetaSnapshot,
 } from "@du/phases/meta";
 
-import type { AppDispatch, RootState } from "./store";
+import type { RootState } from "./store";
 
 type PhaseState = {
   current: PhaseId;
@@ -24,39 +22,10 @@ const snap = restoreSnapshot();
 if (snap) hydrateFromSnapshot(snap);
 
 const initialState: PhaseState = {
-  current:
-    (snap?.phaseHistory?.[snap.phaseHistory.length - 1] as PhaseId) ??
-    "01_title",
+  current: (snap?.history.phaseTrail[snap.history.phaseTrail.length - 1] as PhaseId) ?? "01_title",
   meta: getRunMeta(),
   wall: null,
 };
-
-// main thunk used by phases
-
-export function requestTransition(to: PhaseId, payload: PhaseWallPayload) {
-  return (dispatch: AppDispatch, getState: () => RootState) => {
-    const from = getState().phase.current;
-
-    // Build a minimal wall packet for this hop
-    const wall: PhaseWallPacket = buildWallPacket(from, to, payload);
-
-    const result = engineTransition(from, to, wall);
-
-    if (!result.ok) {
-      dispatch(transitionFailed(result.detail));
-      return result;
-    }
-
-    dispatch(
-      setPhaseAndWall({
-        phase: result.phase,
-        wall,
-      }),
-    );
-
-    return result;
-  };
-}
 
 const slice = createSlice({
   name: "phase",

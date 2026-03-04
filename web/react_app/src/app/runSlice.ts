@@ -2,12 +2,29 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { RunLedger, GateChoice, Alignment, PhaseId } from "@du/phases/types";
 import type { RootState } from "./store";
-
-export type RunState = RunLedger | null;
-
-const initialState: RunState = null;
-
 import { getRunMeta, type RunMetaSnapshot } from "@du/phases/meta";
+
+export type RunState = RunLedger;
+
+function emptyRun(): RunLedger {
+    return {
+        runId: "",
+        runner: {
+            runnerId: "",
+            userId: "guest",
+        },
+        gateLock: undefined,
+        progress: { depth: 0, loopCount: 0 },
+        alignment: { current: { light: 0, dark: 0 } },
+        inventory: { memoryFragments: 0, relicIds: [], draftCardIds: [] },
+        history: { phaseTrail: [] },
+        metaFlags: { penitentInsight: 0, rebelBreaches: 0, unlockedCodexKeys: [] },
+        telemetry: { totalClicks: 0, totalRuns: 0 },
+        debugTrace: {},
+    };
+}
+
+const initialState: RunState = emptyRun();
 
 export function hydrateRunFromEngineMeta(): RunLedger | null {
     const meta: RunMetaSnapshot = getRunMeta();
@@ -53,7 +70,6 @@ const runSlice = createSlice({
         },
 
         lockGate(state, action: PayloadAction<{ choice: Required<GateChoice>; lockedAt: PhaseId }>) {
-            if (!state) return;
             state.gateLock = {
                 guide: action.payload.choice.guide,
                 mode: action.payload.choice.mode,
@@ -64,18 +80,15 @@ const runSlice = createSlice({
         },
 
         updateAlignment(state, action: PayloadAction<{ delta: Alignment }>) {
-            if (!state) return;
             state.alignment.current.light += action.payload.delta.light;
             state.alignment.current.dark += action.payload.delta.dark;
         },
 
         advanceDepth(state) {
-            if (!state) return;
             state.progress.depth += 1;
         },
 
         recordPhase(state, action: PayloadAction<PhaseId>) {
-            if (!state) return;
             state.history.phaseTrail.push(action.payload);
         },
 
@@ -83,7 +96,6 @@ const runSlice = createSlice({
             state,
             action: PayloadAction<"light" | "dark" | "secret">
         ) {
-            if (!state) return;
             state.history.lastDoorChoice = action.payload;
         },
 
@@ -91,18 +103,15 @@ const runSlice = createSlice({
             state,
             action: PayloadAction<"death" | "math_fail" | "exit">
         ) {
-            if (!state) return;
             state.history.lastDropReason = action.payload;
             state.progress.loopCount += 1;
         },
 
         addMemoryFragments(state, action: PayloadAction<number>) {
-            if (!state) return;
             state.inventory.memoryFragments += action.payload;
         },
 
         setDraftCards(state, action: PayloadAction<string[]>) {
-            if (!state) return;
             state.inventory.draftCardIds = action.payload;
         },
 
@@ -111,7 +120,7 @@ const runSlice = createSlice({
         },
 
         clearRun() {
-            return null;
+            return emptyRun();
         },
     },
 });
@@ -134,6 +143,6 @@ export const runReducer = runSlice.reducer;
 
 // Selectors
 export const selectRun = (state: RootState) => state.run;
-export const selectRunner = (state: RootState) => state.run?.runner ?? null;
-export const selectGateLock = (state: RootState) => state.run?.gateLock ?? null;
-export const selectAlignment = (state: RootState) => state.run?.alignment.current ?? null;
+export const selectRunner = (state: RootState) => state.run.runner;
+export const selectGateLock = (state: RootState) => state.run.gateLock ?? null;
+export const selectAlignment = (state: RootState) => state.run.alignment.current;

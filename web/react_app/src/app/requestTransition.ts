@@ -2,8 +2,12 @@
 import type { AppDispatch, RootState } from "./store";
 import { setPhaseAndWall, transitionFailed } from "./phaseSlice";
 import {
-    selectRun, updateAlignment, advanceDepth, recordPhase,
-    recordDoorChoice, recordDrop, addMemoryFragments
+    selectRun,
+    advanceDepth,
+    recordPhase,
+    recordDoorChoice,
+    recordDrop,
+    addMemoryFragments,
 } from "./runSlice";
 import type { PhaseWallPacket, PhaseId } from "@du/phases/types";
 import { engineTransition } from "@du/phases"; // your existing pure engine fn
@@ -13,18 +17,18 @@ export function requestTransition(wall: PhaseWallPacket) {
         const state = getState();
         const from: PhaseId = state.phase.current;
 
-        // 1) Guard: wall.from must match current phase
-        if (from !== wall.from) {
+        // 1) Guard: wall.fromPhase must match current phase
+        if (from !== wall.fromPhase) {
             dispatch(
                 transitionFailed(
-                    `Illegal transition: wall.from=${wall.from} but current=${from}`,
+                    `Illegal transition: wall.fromPhase=${wall.fromPhase} but current=${from}`,
                 ),
             );
             return;
         }
 
         // 2) Let engine validate legality and compute next phase
-        const result = engineTransition(from, wall.to);
+        const result = engineTransition(from, wall.toPhase, wall);
         if (!result.ok) {
             dispatch(transitionFailed(result.detail ?? "Transition blocked"));
             return;
@@ -53,6 +57,13 @@ export function requestTransition(wall: PhaseWallPacket) {
                     break;
                 }
                 case "door->drop": {
+                    if (wall.payload.doorChoice) {
+                        dispatch(recordDoorChoice(wall.payload.doorChoice));
+                    }
+                    break;
+                }
+                case "door->draft":
+                case "door->staging": {
                     if (wall.payload.doorChoice) {
                         dispatch(recordDoorChoice(wall.payload.doorChoice));
                     }

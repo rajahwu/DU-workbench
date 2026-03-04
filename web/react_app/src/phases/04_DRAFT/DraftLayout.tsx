@@ -1,8 +1,10 @@
 import React from 'react';
 import { Outlet } from 'react-router';
 import { getRunMeta } from '@du/phases';
-import { useAppDispatch } from "@/app/hooks";
-import { requestTransition } from "@/app/phaseSlice";
+import { buildWallPacket, type DraftToLevelWall } from '@du/phases/types';
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { requestTransition } from "@/app/requestTransition";
+import { selectRun } from '@/app/runSlice';
 import type { DraftShellContext } from './DraftShell.types';
 import type { DraftCard } from '@data/cards/types';
 import './style.css';
@@ -15,29 +17,22 @@ import './style.css';
 export default function DraftLayout() {
     const runMeta = getRunMeta();
     const dispatch = useAppDispatch();
+    const run = useAppSelector(selectRun);
 
     const handleEnterDepth = (selectedCards: unknown[]) => {
-        const rawPacket = localStorage.getItem('dudael:active_packet');
-        const packet    = rawPacket ? JSON.parse(rawPacket) : { ts: Date.now() };
         const cards = selectedCards as DraftCard[];
 
         const lightDelta = cards.reduce((sum, c) => sum + (c.mechanics?.lightDelta ?? 0), 0);
         const darkDelta  = cards.reduce((sum, c) => sum + (c.mechanics?.darkDelta  ?? 0), 0);
 
-        const updatedPacket = {
-            ...packet,
-            from: '04_draft',
-            to:   '05_level',
-            meta: {
-                ...packet.meta,
-                draftedCards:   cards,
-                paritySnapshot: {
-                    light: (runMeta?.alignment?.light ?? 0) + lightDelta,
-                    dark:  (runMeta?.alignment?.dark  ?? 0) + darkDelta,
-                },
-            },
+        const payload: DraftToLevelWall = {
+            kind: 'draft->level',
+            runId: run?.runId ?? runMeta.runId,
+            draftResultId: cards.map((card) => card.id).join('|'),
         };
-        dispatch(requestTransition("05_level", updatedPacket));
+        const wall = buildWallPacket('04_draft', '05_level', payload);
+
+        dispatch(requestTransition(wall));
     };
 
     const ctx: DraftShellContext = { runMeta, onEnterDepth: handleEnterDepth };
@@ -56,11 +51,11 @@ export default function DraftLayout() {
                 <div className="parity-display">
                     <span>
                         <span className="parity-dot light"></span>
-                        {runMeta.alignment.light}
+                        {runMeta.alignment.current.light}
                     </span>
                     <span>
                         <span className="parity-dot dark"></span>
-                        {runMeta.alignment.dark}
+                        {runMeta.alignment.current.dark}
                     </span>
                 </div>
             </div>

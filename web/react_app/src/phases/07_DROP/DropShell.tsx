@@ -1,7 +1,9 @@
-import { getRunMeta, buildPacket } from "@du/phases";
+import { getRunMeta } from "@du/phases";
+import { buildWallPacket, type DropToStagingWall } from "@du/phases/types";
 import { shouldIncrementMetaCounter, VESSELS, type VesselId } from "@data/vessels/vessels";
-import { useAppDispatch } from "@/app/hooks";
-import { requestTransition } from "@/app/phaseSlice";
+import { useAppDispatch, useAppSelector } from "@/app/hooks";
+import { requestTransition } from "@/app/requestTransition";
+import { selectRun } from "@/app/runSlice";
 import DropScreen from "./DropScreen";
 
 /**
@@ -12,34 +14,29 @@ import DropScreen from "./DropScreen";
 export default function DropShell() {
     const runMeta = getRunMeta();
     const dispatch = useAppDispatch();
+    const run = useAppSelector(selectRun);
 
-    const rawPacket = localStorage.getItem("dudael:active_packet");
-    const packet = rawPacket ? JSON.parse(rawPacket) : null;
-    const vesselId = (packet?.player?.vessel ?? "EXILE") as VesselId;
+    const vesselId = (runMeta.runner.vesselId ?? "EXILE") as VesselId;
     const vesselConfig = VESSELS[vesselId];
 
-    const levelResult = packet?.meta?.levelResult || { survived: false, points: 0 };
-    const forcedDrop = packet?.meta?.forcedDrop;
-    const survived = levelResult.survived && !forcedDrop;
+    const levelResult = { survived: false, points: runMeta.progress.depth };
+    const survived = false;
 
     const metaIncremented = shouldIncrementMetaCounter(vesselId, {
-        insight: runMeta?.insight ?? 0,
-        currentLight: runMeta.alignment.light,
-        currentDark: runMeta.alignment.dark,
+        insight: runMeta.metaFlags.penitentInsight,
+        currentLight: runMeta.alignment.current.light,
+        currentDark: runMeta.alignment.current.dark,
     });
 
     const handleReturnToStaging = () => {
         console.log("♻️ Run concluded. Looping back to Staging...");
+        const wall = buildWallPacket("07_drop", "03_staging", {
+            kind: "drop->staging",
+            runId: run?.runId ?? runMeta.runId,
+            dropReason: "exit",
+        } satisfies DropToStagingWall);
 
-        const newPacket = buildPacket("07_drop", "03_staging", {
-            user: packet?.user || { id: "guest", kind: "user" },
-            player: packet?.player,
-            meta: {
-                previousRun: { depth: runMeta.depth, points: levelResult.points },
-            },
-        });
-
-        dispatch(requestTransition("03_staging", newPacket));
+        dispatch(requestTransition(wall));
     };
 
     return (
