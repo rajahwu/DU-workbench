@@ -1,5 +1,5 @@
 import { getRunMeta } from "@du/phases";
-import { buildWallPacket, type DropToStagingWall } from "@du/phases/types";
+import { buildWallPacketForEdge, type DropToStagingWall } from "@du/phases/types";
 import { shouldIncrementMetaCounter, VESSELS, type VesselId } from "@data/vessels/vessels";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { requestTransition } from "@/app/requestTransition";
@@ -19,8 +19,16 @@ export default function DropShell() {
     const vesselId = (runMeta.runner.vesselId ?? "EXILE") as VesselId;
     const vesselConfig = VESSELS[vesselId];
 
-    const levelResult = { survived: false, points: runMeta.progress.depth };
-    const survived = false;
+    const levelResult = run.history.lastLevelResult
+        ? {
+            survived: run.history.lastLevelResult.survived,
+            points: run.history.lastLevelResult.points,
+        }
+        : { survived: false, points: runMeta.progress.depth };
+
+    const survived = run.history.lastDropReason === "death"
+        ? false
+        : levelResult.survived;
 
     const metaIncremented = shouldIncrementMetaCounter(vesselId, {
         insight: runMeta.metaFlags.penitentInsight,
@@ -30,7 +38,7 @@ export default function DropShell() {
 
     const handleReturnToStaging = () => {
         console.log("♻️ Run concluded. Looping back to Staging...");
-        const wall = buildWallPacket("07_drop", "03_staging", {
+        const wall = buildWallPacketForEdge("07_drop", "03_staging", {
             kind: "drop->staging",
             runId: run?.runId ?? runMeta.runId,
             dropReason: "exit",
@@ -46,6 +54,8 @@ export default function DropShell() {
             levelResult={levelResult}
             vesselConfig={vesselConfig}
             metaIncremented={metaIncremented}
+            lastDoorChoice={run.history.lastDoorChoice}
+            lastDropReason={run.history.lastDropReason}
             onReturnToStaging={handleReturnToStaging}
         />
     );

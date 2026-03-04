@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { selectRun, lockGate } from "@/app/runSlice";
 import { requestTransition } from "@/app/requestTransition";
 import {
-    buildWallPacket,
+    buildWallPacketForEdge,
     PhaseWallPacket,
     SelectToStagingWall,
     GateChoice,
@@ -71,7 +71,7 @@ export default function SelectShell() {
             // alignmentSnapshot optional: only if Staging needs immediate parity
         };
 
-        const wall: PhaseWallPacket = buildWallPacket(
+        const wall: PhaseWallPacket = buildWallPacketForEdge(
             "02_select",
             "03_staging",
             payload,

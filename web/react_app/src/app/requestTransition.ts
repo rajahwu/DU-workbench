@@ -11,6 +11,7 @@ import {
 } from "./runSlice";
 import type { PhaseWallPacket, PhaseId } from "@du/phases/types";
 import { engineTransition } from "@du/phases"; // your existing pure engine fn
+import { saveCheckpoint } from "./checkpoint";
 
 export function requestTransition(wall: PhaseWallPacket) {
     return (dispatch: AppDispatch, getState: () => RootState) => {
@@ -60,6 +61,9 @@ export function requestTransition(wall: PhaseWallPacket) {
                     if (wall.payload.doorChoice) {
                         dispatch(recordDoorChoice(wall.payload.doorChoice));
                     }
+                    if (wall.payload.dropReason) {
+                        dispatch(recordDrop(wall.payload.dropReason));
+                    }
                     break;
                 }
                 case "door->draft":
@@ -91,6 +95,12 @@ export function requestTransition(wall: PhaseWallPacket) {
                 wall,
             }),
         );
+
+        const latest = getState();
+        saveCheckpoint(latest.run, {
+            current: latest.phase.current,
+            wall: latest.phase.wall,
+        });
 
         // 5) Optional: checkpoint for recovery
         // persistRunAndPhase(getState().run, { phase: nextPhase, wall });

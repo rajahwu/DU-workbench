@@ -17,7 +17,7 @@ function emptyRun(): RunLedger {
         progress: { depth: 0, loopCount: 0 },
         alignment: { current: { light: 0, dark: 0 } },
         inventory: { memoryFragments: 0, relicIds: [], draftCardIds: [] },
-        history: { phaseTrail: [] },
+        history: { phaseTrail: [], lastDoorChoice: undefined, lastDropReason: undefined, lastLevelResult: undefined },
         metaFlags: { penitentInsight: 0, rebelBreaches: 0, unlockedCodexKeys: [] },
         telemetry: { totalClicks: 0, totalRuns: 0 },
         debugTrace: {},
@@ -62,7 +62,7 @@ const runSlice = createSlice({
                 progress: { depth: 0, loopCount: 0 },
                 alignment: { current: { light: 0, dark: 0 } },
                 inventory: { memoryFragments: 0, relicIds: [], draftCardIds: [] },
-                history: { phaseTrail: [] },
+                history: { phaseTrail: [], lastDoorChoice: undefined, lastDropReason: undefined, lastLevelResult: undefined },
                 metaFlags: { penitentInsight: 0, rebelBreaches: 0, unlockedCodexKeys: [] },
                 telemetry: { totalClicks: 0, totalRuns: 0 },
                 debugTrace: {},
@@ -115,6 +115,13 @@ const runSlice = createSlice({
             state.inventory.draftCardIds = action.payload;
         },
 
+        recordLevelResult(
+            state,
+            action: PayloadAction<{ survived: boolean; points: number; depth: number }>,
+        ) {
+            state.history.lastLevelResult = action.payload;
+        },
+
         hydrateRun(_state, action: PayloadAction<RunLedger>) {
             return action.payload;
         },
@@ -135,6 +142,7 @@ export const {
     recordDrop,
     addMemoryFragments,
     setDraftCards,
+    recordLevelResult,
     hydrateRun,
     clearRun,
 } = runSlice.actions;

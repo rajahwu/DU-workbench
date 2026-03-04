@@ -3,21 +3,19 @@ import { useAppDispatch } from "@/app/hooks";
 import { requestTransition } from "@/app/requestTransition";
 import { setPhaseAndWall } from "@/app/phaseSlice";
 import type { PhaseId } from "@du/phases";
-import type { PhasePacket } from "@du/phases";
-import { normalizeLegacyPacket } from "@du/phases/types";
+import type { PhaseWallPacket } from "@du/phases/types";
 
-export function BootPacketBridge() {
+export function BootWallBridge() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const onBootPacket = (e: Event) => {
-      const packet = (e as CustomEvent<PhasePacket>).detail;
-      const { wall } = normalizeLegacyPacket(packet);
+    const onBootWall = (e: Event) => {
+      const wall = (e as CustomEvent<PhaseWallPacket>).detail;
       dispatch(requestTransition(wall));
     };
 
-    window.addEventListener("dudael:boot_packet", onBootPacket);
-    return () => window.removeEventListener("dudael:boot_packet", onBootPacket);
+    window.addEventListener("dudael:boot_wall", onBootWall);
+    return () => window.removeEventListener("dudael:boot_wall", onBootWall);
   }, [dispatch]);
 
   return null;

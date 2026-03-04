@@ -6,7 +6,13 @@ import {
   clearSnapshot,
 } from "./meta";
 
-import type { PhaseId, PhasePacket } from "./types";
+import {
+  buildWallPacketForEdge,
+  type PhaseId,
+  type PhasePacket,
+  type PhaseWallPacket,
+  type TitleToSelectWall,
+} from "./types";
 
 const ACTIVE_PACKET_KEY = "dudael:active_packet";
 
@@ -33,6 +39,21 @@ function validatePacket(p: unknown): p is PhasePacket {
 function sessionIdFromPacket(packet: PhasePacket) {
   const uid = packet.user?.id ?? "guest";
   return `run_${uid}_${Math.floor(packet.ts)}`;
+}
+
+function toBootWall(packet: PhasePacket): PhaseWallPacket | null {
+  if (packet.from !== "01_title" || packet.to !== "02_select") {
+    return null;
+  }
+
+  const pathHint = packet.meta?.path === "full" ? "full" : "lite";
+  const payload: TitleToSelectWall = {
+    kind: "title->select",
+    userRef: { userId: packet.user?.id ?? "guest" },
+    pathHint,
+  };
+
+  return buildWallPacketForEdge(packet.from, packet.to, payload);
 }
 
 export function commitActivePacket(packet: PhasePacket) {
@@ -112,11 +133,21 @@ export function boot() {
       // seed alignment/depth/inventory here if packet includes them later
     });
 
+    const wall = toBootWall(detail);
+    if (!wall) {
+      window.dispatchEvent(
+        new CustomEvent("dudael:boot_error", {
+          detail: { reason: "unsupported_boot_edge" },
+        })
+      );
+      return;
+    }
+
     // IMPORTANT: do NOT transition here anymore.
     // Tell the surface to request the transition via Redux.
     window.dispatchEvent(
-      new CustomEvent("dudael:boot_packet", {
-        detail,
+      new CustomEvent("dudael:boot_wall", {
+        detail: wall,
       })
     );
   });

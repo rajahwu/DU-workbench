@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { getRunMeta } from "@du/phases";
-import { buildWallPacket, type PhaseWallPacket, type StagingToDraftWall } from "@du/phases/types";
+import { buildWallPacketForEdge, type PhaseWallPacket, type StagingToDraftWall } from "@du/phases/types";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { requestTransition } from "@/app/requestTransition";
 import { selectRun } from "@/app/runSlice";
@@ -23,7 +23,7 @@ export default function StagingShell() {
             kind: "staging->draft",
             runId: run?.runId ?? runMeta.runId,
         };
-        const wall: PhaseWallPacket = buildWallPacket("03_staging", "04_draft", payload);
+        const wall: PhaseWallPacket = buildWallPacketForEdge("03_staging", "04_draft", payload);
 
         dispatch(requestTransition(wall));
     };

@@ -1,7 +1,7 @@
 import { getRunMeta } from "@du/phases";
 import { getDoorCosts, getSecretDoorThreshold, type VesselId } from "@data/vessels/vessels";
 import type { PhaseId } from "@du/phases/types";
-import { buildWallPacket, type DoorToDropWall, type DoorToDraftWall } from "@du/phases/types";
+import { buildWallPacketForEdge, type DoorToDropWall, type DoorToDraftWall } from "@du/phases/types";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { requestTransition } from "@/app/requestTransition";
 import { selectRun } from "@/app/runSlice";
@@ -37,12 +37,13 @@ export default function DoorShell() {
         const targetPhase = (isMaxDepth ? "07_drop" : "04_draft") as PhaseId;
 
         const wall = targetPhase === "07_drop"
-            ? buildWallPacket("06_door", "07_drop", {
+            ? buildWallPacketForEdge("06_door", "07_drop", {
                 kind: "door->drop",
                 runId: run?.runId ?? runMeta.runId,
                 doorChoice: path,
+                dropReason: "exit",
             } satisfies DoorToDropWall)
-            : buildWallPacket("06_door", "04_draft", {
+            : buildWallPacketForEdge("06_door", "04_draft", {
                 kind: "door->draft",
                 runId: run?.runId ?? runMeta.runId,
                 doorChoice: path,
@@ -53,10 +54,11 @@ export default function DoorShell() {
 
     const handleForcedDrop = () => {
         console.log("☠️ No doors available. Forced Drop.");
-        const wall = buildWallPacket("06_door", "07_drop", {
+        const wall = buildWallPacketForEdge("06_door", "07_drop", {
             kind: "door->drop",
             runId: run?.runId ?? runMeta.runId,
             doorChoice: "dark",
+            dropReason: "death",
         } satisfies DoorToDropWall);
 
         dispatch(requestTransition(wall));

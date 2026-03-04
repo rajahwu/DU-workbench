@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router';
 import { getRunMeta } from '@du/phases';
-import { buildWallPacket, type DraftToLevelWall } from '@du/phases/types';
+import { buildWallPacketForEdge, type DraftToLevelWall } from '@du/phases/types';
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { requestTransition } from "@/app/requestTransition";
 import { selectRun } from '@/app/runSlice';
@@ -30,7 +30,7 @@ export default function DraftLayout() {
             runId: run?.runId ?? runMeta.runId,
             draftResultId: cards.map((card) => card.id).join('|'),
         };
-        const wall = buildWallPacket('04_draft', '05_level', payload);
+        const wall = buildWallPacketForEdge('04_draft', '05_level', payload);
 
         dispatch(requestTransition(wall));
     };

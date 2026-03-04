@@ -76,12 +76,16 @@ export type GateSelection = {
 export type PhaseWallPayload =
   | TitleToSelectWall
   | SelectToStagingWall
+  | StagingToSelectWall
   | StagingToDraftWall
   | DraftToLevelWall
+  | DraftToStagingWall
   | LevelToDoorWall
   | DoorToDraftWall
   | DoorToStagingWall
   | DoorToDropWall
+  | DropToDraftWall
+  | DropToTitleWall
   | DropToStagingWall;
 
 export type TitleToSelectWall = {
@@ -98,6 +102,11 @@ export type SelectToStagingWall = {
   alignmentSnapshot?: Alignment; // only if Staging needs it
 };
 
+export type StagingToSelectWall = {
+  kind: "staging->select";
+  runId: string;
+};
+
 
 export type StagingToDraftWall = {
   kind: "staging->draft";
@@ -110,6 +119,11 @@ export type DraftToLevelWall = {
   draftResultId?: string;
 };
 
+export type DraftToStagingWall = {
+  kind: "draft->staging";
+  runId: string;
+};
+
 export type LevelToDoorWall = {
   kind: "level->door";
   runId: string;
@@ -119,6 +133,7 @@ export type DoorToDropWall = {
   kind: "door->drop";
   runId: string;
   doorChoice?: "light" | "dark" | "secret";
+  dropReason?: "death" | "math_fail" | "exit";
 };
 
 export type DoorToDraftWall = {
@@ -131,6 +146,16 @@ export type DoorToStagingWall = {
   kind: "door->staging";
   runId: string;
   doorChoice?: "light" | "dark" | "secret";
+};
+
+export type DropToDraftWall = {
+  kind: "drop->draft";
+  runId: string;
+};
+
+export type DropToTitleWall = {
+  kind: "drop->title";
+  runId: string;
 };
 
 export type DropToStagingWall = {
@@ -155,6 +180,54 @@ export function buildWallPacket(
   to: PhaseId,
   payload: PhaseWallPayload,
 ): PhaseWallPacket {
+  return buildWallPacketForEdge(from, to, payload);
+}
+
+type PhaseEdge = `${PhaseId}->${PhaseId}`;
+type PhaseWallKind = PhaseWallPayload["kind"];
+
+const WALL_KINDS_BY_EDGE: Partial<Record<PhaseEdge, PhaseWallKind[]>> = {
+  "01_title->02_select": ["title->select"],
+  "02_select->03_staging": ["select->staging"],
+  "03_staging->02_select": ["staging->select"],
+  "03_staging->04_draft": ["staging->draft"],
+  "04_draft->03_staging": ["draft->staging"],
+  "04_draft->05_level": ["draft->level"],
+  "05_level->06_door": ["level->door"],
+  "06_door->04_draft": ["door->draft"],
+  "06_door->03_staging": ["door->staging"],
+  "06_door->07_drop": ["door->drop"],
+  "07_drop->04_draft": ["drop->draft"],
+  "07_drop->01_title": ["drop->title"],
+  "07_drop->03_staging": ["drop->staging"],
+};
+
+export function allowedWallKindsForEdge(
+  from: PhaseId,
+  to: PhaseId,
+): readonly PhaseWallKind[] {
+  return WALL_KINDS_BY_EDGE[`${from}->${to}`] ?? [];
+}
+
+export function assertWallPayloadForEdge(
+  from: PhaseId,
+  to: PhaseId,
+  payload: PhaseWallPayload,
+): void {
+  const allowed = allowedWallKindsForEdge(from, to);
+  if (!allowed.includes(payload.kind)) {
+    throw new Error(
+      `invalid_wall_payload_kind:${from}->${to}:${payload.kind}`,
+    );
+  }
+}
+
+export function buildWallPacketForEdge(
+  from: PhaseId,
+  to: PhaseId,
+  payload: PhaseWallPayload,
+): PhaseWallPacket {
+  assertWallPayloadForEdge(from, to, payload);
   return {
     fromPhase: from,
     toPhase: to,
@@ -230,6 +303,11 @@ export type RunLedger = {
     phaseTrail: PhaseId[];
     lastDoorChoice?: "light" | "dark" | "secret";
     lastDropReason?: "death" | "math_fail" | "exit";
+    lastLevelResult?: {
+      survived: boolean;
+      points: number;
+      depth: number;
+    };
   };
 
   // Optional extension buckets
@@ -269,67 +347,4 @@ export type PhasePacket = {
   meta?: Record<string, unknown>;
 };
 
-export type LegacyPhasePacket = PhasePacket; // rename file-local
-
-export function normalizeLegacyPacket(
-  legacy: LegacyPhasePacket,
-): { run: Partial<RunLedger>; wall: PhaseWallPacket } {
-  const runId = legacy.meta?.runId as string || `run-${legacy.ts}`;
-
-  const runner: RunnerProfile = {
-    runnerId: runId,
-    userId: legacy.user?.id,
-    displayName: legacy.player?.displayName,
-    vesselId: (legacy.gate?.vesselId ??
-      legacy.identity?.vessel) as VesselId | undefined,
-    sigilKey: legacy.identity?.sigil,
-  };
-
-  const gateLock = legacy.gate?.vesselId
-    ? {
-      guide: legacy.gate.guide!,
-      mode: legacy.gate.mode!,
-      vesselId: legacy.gate.vesselId!,
-      lockedAt: legacy.to,
-    }
-    : undefined;
-
-  const run: Partial<RunLedger> = {
-    runId,
-    runner,
-    gateLock,
-    progress: { depth: legacy.depth ?? 0, loopCount: 0 },
-    alignment: { current: legacy.alignment ?? { light: 0, dark: 0 } },
-    inventory: {
-      memoryFragments: 0,
-      relicIds: [],
-      draftCardIds: legacy.inventory ?? [],
-    },
-    history: { phaseTrail: [legacy.from, legacy.to] },
-  };
-
-  const wall = buildWallPacket(
-    legacy.from,
-    legacy.to,
-    {
-      kind: `${legacy.from.replace("01_", "title")
-        .replace("02_", "select")
-        .replace("03_", "staging")
-        .replace("04_", "draft")
-        .replace("05_", "level")
-        .replace("06_", "door")
-        .replace("07_", "drop")}->${legacy.to.replace("01_", "title")
-          .replace("02_", "select")
-          .replace("03_", "staging")
-          .replace("04_", "draft")
-          .replace("05_", "level")
-          .replace("06_", "door")
-          .replace("07_", "drop")}` as PhaseWallPayload["kind"],
-      runId,
-      runnerRef: { runnerId: runId },
-    } as any,  // you can branch kind-specific logic here
-  );
-
-  return { run, wall };
-}
 

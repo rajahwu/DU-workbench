@@ -11,6 +11,7 @@ export type { Alignment, PhaseId } from "./types";
 export type Parity = "light" | "dark" | "neutral";
 
 export type RunMetaSnapshot = {
+  schemaVersion: number;
   runId: string;
   runner: {
     userId?: string;
@@ -50,6 +51,7 @@ export type RunMetaSnapshot = {
 };
 
 const STORAGE_KEY = "dudael:run_meta";
+const RUN_META_SCHEMA_VERSION = 1;
 
 function now() {
   return Date.now();
@@ -57,6 +59,7 @@ function now() {
 
 function defaultMeta(): RunMetaSnapshot {
   return {
+    schemaVersion: RUN_META_SCHEMA_VERSION,
     runId: "",
     runner: {},
     gateLock: undefined,
@@ -181,28 +184,55 @@ export function restoreSnapshot(): RunMetaSnapshot | null {
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    return JSON.parse(raw) as RunMetaSnapshot;
+    const parsed = JSON.parse(raw) as Partial<RunMetaSnapshot>;
+    const migrated = migrateSnapshot(parsed);
+    return migrated;
   } catch {
     return null;
   }
 }
 
-export function hydrateFromSnapshot(snap: RunMetaSnapshot) {
-  state = {
+function migrateSnapshot(
+  snapshot: Partial<RunMetaSnapshot>,
+): RunMetaSnapshot | null {
+  if (typeof snapshot !== "object" || snapshot === null) {
+    return null;
+  }
+
+  const schemaVersion =
+    typeof snapshot.schemaVersion === "number"
+      ? snapshot.schemaVersion
+      : RUN_META_SCHEMA_VERSION;
+
+  if (schemaVersion > RUN_META_SCHEMA_VERSION) {
+    return null;
+  }
+
+  return {
     ...defaultMeta(),
-    ...snap,
-    runner: { ...defaultMeta().runner, ...(snap.runner ?? {}) },
-    progress: { ...defaultMeta().progress, ...(snap.progress ?? {}) },
+    ...snapshot,
+    schemaVersion: RUN_META_SCHEMA_VERSION,
+    runner: { ...defaultMeta().runner, ...(snapshot.runner ?? {}) },
+    progress: { ...defaultMeta().progress, ...(snapshot.progress ?? {}) },
     alignment: {
       current: {
         ...defaultMeta().alignment.current,
-        ...(snap.alignment?.current ?? {}),
+        ...(snapshot.alignment?.current ?? {}),
       },
     },
-    inventory: { ...defaultMeta().inventory, ...(snap.inventory ?? {}) },
-    history: { ...defaultMeta().history, ...(snap.history ?? {}) },
-    metaFlags: { ...defaultMeta().metaFlags, ...(snap.metaFlags ?? {}) },
+    inventory: { ...defaultMeta().inventory, ...(snapshot.inventory ?? {}) },
+    history: { ...defaultMeta().history, ...(snapshot.history ?? {}) },
+    metaFlags: { ...defaultMeta().metaFlags, ...(snapshot.metaFlags ?? {}) },
   };
+}
+
+export function hydrateFromSnapshot(snap: RunMetaSnapshot) {
+  const migrated = migrateSnapshot(snap);
+  if (!migrated) {
+    state = defaultMeta();
+  } else {
+    state = migrated;
+  }
   touch();
   snapshot();
 }

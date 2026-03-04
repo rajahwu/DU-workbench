@@ -3,7 +3,7 @@ import { useAppDispatch } from "@/app/hooks";
 import { initRun } from "@/app/runSlice";
 import type { AppDispatch } from "@/app/store";
 import { requestTransition } from "@/app/requestTransition";
-import { buildWallPacket, PhaseWallPacket, TitleToSelectWall } from "@du/phases/types";
+import { buildWallPacketForEdge, PhaseWallPacket, TitleToSelectWall } from "@du/phases/types";
 import TitleScreen from "./TitleScreen";
 
 function createRunId() {
@@ -29,7 +29,7 @@ export async function handleEnterFromTitle(dispatch: AppDispatch, userId?: strin
         pathHint: userId ? "full" : "lite",
     };
 
-    const wall: PhaseWallPacket = buildWallPacket("01_title", "02_select", payload);
+    const wall: PhaseWallPacket = buildWallPacketForEdge("01_title", "02_select", payload);
 
     // dispatch your existing requestTransition thunk with this wall
     dispatch(requestTransition(wall));

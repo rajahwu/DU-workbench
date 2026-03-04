@@ -16,22 +16,22 @@
 
 ### Architecture
 
-- [ ] Persist `{ run, phase, wall }` checkpoint after each successful transition.
-- [ ] Hydrate both `runSlice` and `phaseSlice` from shared checkpoint on reload.
-- [ ] Replace `PhasePacket` boot event with wall-native boot event.
-- [ ] Remove legacy packet normalization bridge after migration completion.
+- [x] Persist `{ run, phase, wall }` checkpoint after each successful transition.
+- [x] Hydrate both `runSlice` and `phaseSlice` from shared checkpoint on reload.
+- [x] Replace `PhasePacket` boot event with wall-native boot event.
+- [x] Remove legacy packet normalization bridge after migration completion.
 
 ### Contracts
 
-- [ ] Add a strict `(from,to) -> payload.kind` mapping utility and use in `buildWallPacket` callers.
-- [ ] Audit `manager.LEGAL` edges vs `PhaseWallPayload` kinds for complete parity.
-- [ ] Introduce schema versioning for `RunMetaSnapshot` persisted data.
+- [x] Add a strict `(from,to) -> payload.kind` mapping utility and use in `buildWallPacket` callers.
+- [x] Audit `manager.LEGAL` edges vs `PhaseWallPayload` kinds for complete parity.
+- [x] Introduce schema versioning for `RunMetaSnapshot` persisted data.
 
 ### Gameplay data consistency
 
-- [ ] Feed real `levelResult` into drop summary instead of placeholder derivation.
-- [ ] Persist and display `lastDoorChoice`/`lastDropReason` from run ledger where useful.
-- [ ] Confirm alignment deltas are applied exactly once per loop edge.
+- [x] Feed real `levelResult` into drop summary instead of placeholder derivation.
+- [x] Persist and display `lastDoorChoice`/`lastDropReason` from run ledger where useful.
+- [x] Confirm alignment deltas are applied exactly once per loop edge.
 
 ### Quality
 

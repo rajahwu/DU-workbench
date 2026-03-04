@@ -1,9 +1,9 @@
 import { getRunMeta } from "@du/phases";
-import { buildWallPacket, type LevelToDoorWall } from "@du/phases/types";
+import { buildWallPacketForEdge, type LevelToDoorWall } from "@du/phases/types";
 import { VESSELS, getLevelCombatDeltas, type VesselId } from "@data/vessels/vessels";
 import { useAppDispatch, useAppSelector } from "@/app/hooks";
 import { requestTransition } from "@/app/requestTransition";
-import { selectRun, updateAlignment } from "@/app/runSlice";
+import { recordLevelResult, selectRun, updateAlignment } from "@/app/runSlice";
 import LevelScreen from "./LevelScreen";
 
 /**
@@ -26,13 +26,14 @@ export default function LevelShell() {
         const nextLight = survived ? 1 : 0;
         const nextDark = survived ? 0 : 1;
 
+        dispatch(recordLevelResult({ survived, points, depth }));
         dispatch(updateAlignment({ delta: { light: nextLight, dark: nextDark } }));
 
         const payload: LevelToDoorWall = {
             kind: "level->door",
             runId: run?.runId ?? runMeta.runId,
         };
-        const wall = buildWallPacket("05_level", "06_door", payload);
+        const wall = buildWallPacketForEdge("05_level", "06_door", payload);
 
         dispatch(requestTransition(wall));
     };

@@ -2,7 +2,7 @@
 import { store } from "@/app/store";
 import { requestTransition } from "@/app/requestTransition";
 import { setPhaseAndWall } from "@/app/phaseSlice";
-import { buildWallPacket } from "@du/phases/types";
+import { buildWallPacketForEdge } from "@du/phases/types";
 
 
 window.addEventListener("keydown", (e) => {
@@ -10,7 +10,7 @@ window.addEventListener("keydown", (e) => {
   if (e.shiftKey && e.key === "3") {
     store.dispatch(
       requestTransition(
-        buildWallPacket("06_door", "03_staging", {
+        buildWallPacketForEdge("06_door", "03_staging", {
           kind: "door->staging",
           runId: "dev-run",
           doorChoice: "secret",

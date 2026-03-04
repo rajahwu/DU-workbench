@@ -8,6 +8,8 @@ type DropScreenProps = {
     levelResult: { survived: boolean; points: number };
     vesselConfig: { mechanics: { metaCounter?: string | null } };
     metaIncremented: boolean;
+    lastDoorChoice?: "light" | "dark" | "secret";
+    lastDropReason?: "death" | "math_fail" | "exit";
     onReturnToStaging: () => void;
 };
 
@@ -22,6 +24,8 @@ export default function DropScreen({
     levelResult,
     vesselConfig,
     metaIncremented,
+    lastDoorChoice,
+    lastDropReason,
     onReturnToStaging,
 }: DropScreenProps) {
     return (
@@ -73,6 +77,14 @@ export default function DropScreen({
                     <div className="drop-stat">
                         <span className="drop-stat-label">Total Loops</span>
                         <span className="drop-stat-value">{runMeta.progress.loopCount}</span>
+                    </div>
+                    <div className="drop-stat">
+                        <span className="drop-stat-label">Last Door</span>
+                        <span className="drop-stat-value">{lastDoorChoice?.toUpperCase() ?? "—"}</span>
+                    </div>
+                    <div className="drop-stat">
+                        <span className="drop-stat-label">Drop Reason</span>
+                        <span className="drop-stat-value">{lastDropReason?.toUpperCase() ?? "—"}</span>
                     </div>
                 </div>
 

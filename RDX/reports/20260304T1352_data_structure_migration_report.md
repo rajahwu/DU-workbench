@@ -63,11 +63,11 @@ Result: the app now operates on one architectural pattern for phase movement and
 
 ## Risks / Notes
 
-- Some screen-level gameplay data still uses transitional placeholders (e.g., level result in `DropShell`), but structure and packet flow are now unified.
-- Legacy boot exchange still emits `PhasePacket`; bridge conversion now normalizes it into wall packets before dispatch.
+- Follow-up pass completed contract parity and gameplay summary wiring; Drop now reads persisted run-ledger outcomes.
+- Boot bridge is now wall-native (`dudael:boot_wall`) and shared checkpoint hydration restores both run + phase slices.
 
 ## Recommended Next Slice
 
-1. Persist `RunLedger` checkpoints alongside phase walls (`run + wall`) for reload continuity.
-2. Move door/drop outcome payload enrichment from local placeholders to true gameplay outputs.
-3. Remove legacy `PhasePacket` exchange path once title boot flow is fully wall-native.
+1. Add transition/side-effect integration tests for all wall kinds.
+2. Add regression tests for one-way gates (`lockIdentity`) and depth increment rules.
+3. Keep doc cleanup pass to remove outdated references to old packet-based transition guidance.

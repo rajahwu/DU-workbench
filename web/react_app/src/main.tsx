@@ -3,6 +3,9 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
 import { Provider } from "react-redux";
 import { store } from "@/app/store";
+import { hydrateRun } from "@/app/runSlice";
+import { setPhaseAndWall } from "@/app/phaseSlice";
+import { loadCheckpoint } from "@/app/checkpoint";
 import RootLayout from "./components/Layouts/RootLayout";
 import { DraftLayout, DraftApproach, DraftOffering, DraftReckoning, DraftRouter } from "@/phases/04_DRAFT";
 import { TitleStage, SelectStage, StagingStage, LevelStage, DoorStage, DropStage } from "@/phases";
@@ -33,6 +36,17 @@ const router = createBrowserRouter([
         ],
     },
 ]);
+
+const checkpoint = loadCheckpoint();
+if (checkpoint) {
+    store.dispatch(hydrateRun(checkpoint.run));
+    store.dispatch(
+        setPhaseAndWall({
+            phase: checkpoint.phase.current,
+            wall: checkpoint.phase.wall,
+        }),
+    );
+}
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <StrictMode>
